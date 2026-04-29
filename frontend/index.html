@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raahi – Travel with Confidence</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hero {
+            position: relative;
+            padding: 120px 0;
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            border-radius: 0 0 var(--rounded-xl) var(--rounded-xl);
+            margin-bottom: var(--space-section);
+        }
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('assets/hero-bg.png') center/cover no-repeat;
+            z-index: 0;
+        }
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.6) 100%);
+            z-index: 1;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+        }
+        .hero-title {
+            color: white;
+            margin-bottom: var(--space-md);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .hero-subtitle {
+            color: rgba(255,255,255,0.9);
+            font-size: 20px;
+            margin-bottom: var(--space-xl);
+            line-height: 1.4;
+        }
+        
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--color-surface-soft);
+            border-radius: var(--rounded-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: var(--space-md);
+            color: var(--color-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="index.html" class="brand-logo">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                    </svg>
+                </div>
+                Raahi
+            </a>
+            
+            <div class="nav-links">
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="dashboard.html" class="nav-link">How it works</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            
+            <div class="nav-actions">
+                <a href="login.html" class="nav-link">Log in</a>
+                <a href="register.html" class="btn btn-primary btn-pill">Sign up</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-bg"></div>
+            <div class="hero-overlay"></div>
+            <div class="container hero-content">
+                <h1 class="text-display-xl hero-title">Explore the world. We've got your back.</h1>
+                <p class="hero-subtitle">Raahi is your premium travel safety companion. Real-time tracking, immediate emergency response, and peace of mind wherever you go.</p>
+                <div class="flex-center" style="justify-content: flex-start; gap: var(--space-md);">
+                    <a href="register.html" class="btn btn-primary">Get started</a>
+                    <a href="about.html" class="btn btn-secondary" style="background: white;">Learn more</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="section container">
+            <div class="mb-xl text-center">
+                <h2 class="text-display-lg mb-sm">Travel with confidence</h2>
+                <p class="text-body-lg" style="max-width: 600px; margin: 0 auto;">Designed for the modern traveler, Raahi combines cutting-edge location technology with an intuitive, premium interface.</p>
+            </div>
+            
+            <div class="grid-3">
+                <div class="card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="text-title-lg mb-xs">Instant SOS</h3>
+                    <p class="text-body-md">One tap alerts your emergency contacts and local authorities with your precise location.</p>
+                </div>
+                <div class="card">
+                    <div class="feature-icon">📍</div>
+                    <h3 class="text-title-lg mb-xs">Live Tracking</h3>
+                    <p class="text-body-md">Share your journey securely with loved ones. They can see your route update in real-time.</p>
+                </div>
+                <div class="card">
+                    <div class="feature-icon">🌐</div>
+                    <h3 class="text-title-lg mb-xs">Offline Sync</h3>
+                    <p class="text-body-md">No signal? No problem. Raahi queues your updates and syncs the moment you reconnect.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="section-lg container" style="border-top: 1px solid var(--color-hairline); margin-top: var(--space-section);">
+            <div class="grid-2" style="align-items: center;">
+                <div>
+                    <h2 class="text-display-lg mb-md">Ready for your next adventure?</h2>
+                    <p class="text-body-lg mb-lg">Join thousands of travelers who explore freely, knowing Raahi is there if they need it.</p>
+                    <a href="register.html" class="btn btn-primary">Create your account</a>
+                </div>
+                <div class="card" style="background: var(--color-surface-soft); display: flex; align-items: center; justify-content: center; min-height: 300px;">
+                    <div class="text-center">
+                        <div class="brand-icon" style="width: 64px; height: 64px; margin: 0 auto var(--space-md); font-size: 32px;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-title-lg">Raahi Protection</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4 class="footer-heading">Support</h4>
+                    <a href="contact.html" class="footer-link">Help Center</a>
+                    <a href="contact.html" class="footer-link">Safety Information</a>
+                    <a href="contact.html" class="footer-link">Cancellation Options</a>
+                </div>
+                <div>
+                    <h4 class="footer-heading">Company</h4>
+                    <a href="about.html" class="footer-link">About Us</a>
+                    <a href="about.html" class="footer-link">Careers</a>
+                    <a href="about.html" class="footer-link">Investors</a>
+                </div>
+                <div>
+                    <h4 class="footer-heading">Platform</h4>
+                    <a href="dashboard.html" class="footer-link">Dashboard</a>
+                    <a href="tracking.html" class="footer-link">Live Tracking</a>
+                    <a href="sos.html" class="footer-link">SOS Emergency</a>
+                </div>
+                <div>
+                    <h4 class="footer-heading">Legal</h4>
+                    <a href="terms.html" class="footer-link">Terms of Service</a>
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div>© 2026 Raahi, Inc.</div>
+                <div style="display: flex; gap: var(--space-md);">
+                    <a href="#" class="footer-link" style="margin: 0;">English (IN)</a>
+                    <a href="#" class="footer-link" style="margin: 0;">₹ INR</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
