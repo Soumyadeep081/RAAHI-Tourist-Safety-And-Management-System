@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investors – Raahi</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        html { scroll-behavior: smooth; }
+        .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+        .hero { position: relative; padding: 160px 0 100px; background: url('https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=1200') center/cover no-repeat; border-radius: 0 0 var(--rounded-xl) var(--rounded-xl); margin-bottom: var(--space-xl); }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.8) 100%); border-radius: 0 0 var(--rounded-xl) var(--rounded-xl); }
+        .hero-content { position: relative; z-index: 1; color: white; max-width: 800px; }
+    </style>
+</head>
+<body>
+    <nav class="navbar" style="background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);">
+        <div class="container">
+            <a href="../index.html" class="brand-logo">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                Raahi
+            </a>
+            <div class="nav-links">
+                <a href="about.html" class="nav-link">Our Story</a>
+                <a href="../index.html#features" class="nav-link">How it works</a>
+                <a href="help.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions" id="nav-auth-actions">
+                <a href="login.html" class="nav-link">Log in</a>
+                <a href="register.html" class="btn btn-primary btn-pill">Sign up</a>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section class="hero fade-up">
+            <div class="hero-overlay"></div>
+            <div class="container hero-content text-center">
+                <h1 class="text-display-lg mb-md" style="color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Investors</h1>
+                <p class="text-body-lg" style="color: rgba(255,255,255,0.9); font-size: 20px;">Partner with us to protect millions of travelers worldwide.</p>
+            </div>
+        </section>
+        <section class="section container fade-up" style="max-width: 800px; line-height: 1.8;">
+                            <div class="card" style="padding: 40px; border: none; box-shadow: 0 10px 40px rgba(0,0,0,0.05);">
+                    <h2 class="text-title-lg mb-md">Growth & Impact</h2>
+                    <p class="text-body-md mb-lg" style="color: var(--color-muted);">Raahi operates at the intersection of travel tech and personal security—a rapidly expanding market. We are backed by leading venture capital firms who believe in our mission.</p>
+                    <div class="grid-2" style="gap: 24px; margin-bottom: 32px;">
+                        <div style="text-align: center; padding: 24px; background: #F8FAFC; border-radius: 16px;">
+                            <div class="text-display-md" style="color: var(--color-primary);">2M+</div>
+                            <div class="text-caption">Active Users</div>
+                        </div>
+                        <div style="text-align: center; padding: 24px; background: #F8FAFC; border-radius: 16px;">
+                            <div class="text-display-md" style="color: var(--color-primary);">150+</div>
+                            <div class="text-caption">Countries Supported</div>
+                        </div>
+                    </div>
+                    <p class="text-body-sm text-center">For investor relations inquiries, please email invest@raahi.com.</p>
+                </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h4 class="footer-heading">Support</h4>
+                    <a href="help.html" class="footer-link">Help Center</a>
+                    <a href="safety.html" class="footer-link">Safety Information</a>
+                    <a href="cancellation.html" class="footer-link">Cancellation Options</a>
+                </div>
+                <div>
+                    <h4 class="footer-heading">Company</h4>
+                    <a href="about.html" class="footer-link">About Us</a>
+                    <a href="careers.html" class="footer-link">Careers</a>
+                    <a href="investors.html" class="footer-link">Investors</a>
+                </div>
+                <div>
+                    <h4 class="footer-heading">Platform</h4>
+                    <a href="dashboard.html" class="footer-link">Dashboard</a>
+                    <a href="tracking.html" class="footer-link">Live Tracking</a>
+                    <a href="sos.html" class="footer-link">SOS Emergency</a>
+                </div>
+                <div>
+                    <h4 class="footer-heading">Legal</h4>
+                    <a href="terms.html" class="footer-link">Terms of Service</a>
+                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                </div>
+            </div>
+            <div class="footer-bottom"><div>© 2026 Raahi, Inc.</div></div>
+        </div>
+    </footer>
+    <script src="../js/config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof isAuthenticated === 'function' && isAuthenticated()) {
+                const navActions = document.getElementById('nav-auth-actions');
+                if (navActions) {
+                    navActions.innerHTML = '<a href="dashboard.html" class="btn btn-primary btn-pill">Go to Dashboard</a>';
+                }
+            }
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

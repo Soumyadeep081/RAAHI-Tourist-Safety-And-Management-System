@@ -9,6 +9,7 @@ import java.util.List;
 public interface IncidentRepository extends JpaRepository<Incident, Long> {
 
     List<Incident> findByUserIdOrderByCreatedAtDesc(Long userId);
+    long countByUserId(Long userId);
 
     @Query("SELECT i FROM Incident i " +
            "WHERE i.latitude  BETWEEN :minLat AND :maxLat " +

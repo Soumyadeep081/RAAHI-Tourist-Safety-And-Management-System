@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const overviewNameEl = document.getElementById('overview-name');
 
         if (nameEl) nameEl.textContent = user.name;
-        if (avatarEl) avatarEl.textContent = user.name.charAt(0).toUpperCase();
+        if (avatarEl) avatarEl.textContent = user.name;
         if (overviewNameEl) overviewNameEl.textContent = user.name.split(' ')[0];
     }
 
@@ -29,6 +29,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Load dashboard data
     loadDashboardStats();
+    loadContacts();
+    loadMyIncidents();
+    loadMyAlerts();
+    if (typeof loadLocationHistory === 'function') loadLocationHistory();
 
     // Sync any offline data
     if (navigator.onLine) {
@@ -99,30 +103,17 @@ function logout() {
 // ---- Dashboard Stats ----
 async function loadDashboardStats() {
     try {
-        // Load alerts count
-        const alerts = await apiFetch('/alerts/my');
-        const activeAlerts = alerts.filter(a => a.status === 'ACTIVE').length;
-        const statAlerts = document.getElementById('stat-alerts');
-        if (statAlerts) statAlerts.textContent = activeAlerts;
+        const stats = await apiFetch('/stats/dashboard');
+        
+        const updateStat = (id, value) => {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value || '0';
+        };
 
-        // Load contacts count
-        const contacts = await apiFetch('/contacts');
-        const statContacts = document.getElementById('stat-contacts');
-        if (statContacts) statContacts.textContent = contacts.length;
-
-        // Load location count
-        const locations = await apiFetch('/locations');
-        const statLocations = document.getElementById('stat-locations');
-        if (statLocations) statLocations.textContent = locations.length;
-
-        // Load nearby incidents count
-        if (currentPosition.latitude) {
-            const incidents = await apiFetch(
-                `/incidents/nearby?lat=${currentPosition.latitude}&lng=${currentPosition.longitude}&radius=${CONFIG.NEARBY_RADIUS_KM}`
-            );
-            const statIncidents = document.getElementById('stat-incidents');
-            if (statIncidents) statIncidents.textContent = incidents.length;
-        }
+        updateStat('stat-alerts', stats.activeAlerts);
+        updateStat('stat-contacts', stats.contactsCount);
+        updateStat('stat-locations', stats.locationsCount);
+        updateStat('stat-incidents', stats.nearbyIncidents);
     } catch (err) {
         console.error('[Dashboard] Stats load failed:', err);
     }
@@ -157,14 +148,19 @@ async function loadContacts() {
 async function addContact(e) {
     e.preventDefault();
 
+    const nameEl = document.getElementById('contact-name');
+    const phoneEl = document.getElementById('contact-phone');
+    const emailEl = document.getElementById('contact-email');
+    const relationEl = document.getElementById('contact-relation');
+
     try {
         await apiFetch('/contacts', {
             method: 'POST',
             body: JSON.stringify({
-                name: document.getElementById('contact-name').value.trim(),
-                phone: document.getElementById('contact-phone').value.trim(),
-                email: document.getElementById('contact-email').value.trim() || null,
-                relation: document.getElementById('contact-relation').value.trim() || null,
+                name: nameEl.value.trim(),
+                phone: phoneEl.value.trim(),
+                email: emailEl ? emailEl.value.trim() : null,
+                relation: relationEl ? relationEl.value.trim() : null,
             }),
         });
 
@@ -180,6 +176,12 @@ async function addContact(e) {
 async function deleteContact(id) {
     if (!confirm('Remove this emergency contact?')) return;
 
+    // Prevent double-clicking
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '...';
+    btn.disabled = true;
+
     try {
         await apiFetch(`/contacts/${id}`, { method: 'DELETE' });
         showToast('Contact removed', 'info');
@@ -187,6 +189,8 @@ async function deleteContact(id) {
         loadDashboardStats();
     } catch (err) {
         showToast('Failed to delete: ' + err.message, 'error');
+        btn.innerHTML = originalText;
+        btn.disabled = false;
     }
 }
 
@@ -228,13 +232,19 @@ async function reportIncident(e) {
 }
 
 async function loadMyIncidents() {
+    const list = document.getElementById('my-incidents-list');
+    if (!list) return;
+    
+    // Show loading state if it's currently empty or has old data
+    if (list.innerHTML === '' || list.innerHTML.includes('No recent')) {
+        list.innerHTML = '<div style="padding: 32px; text-align: center;"><span class="pulse-dot"></span> Loading reports...</div>';
+    }
+
     try {
         const data = await apiFetch('/incidents/my');
-        const list = document.getElementById('my-incidents-list');
-        if (!list) return;
-
+        
         if (!data || data.length === 0) {
-            list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📝</div><p>You haven\'t reported any incidents</p></div>';
+            list.innerHTML = '<div class="empty-state" style="padding: 32px;"><div class="empty-state-icon">📝</div><p>You haven\'t reported any incidents</p></div>';
             return;
         }
 
@@ -249,5 +259,6 @@ async function loadMyIncidents() {
         `).join('');
     } catch (err) {
         console.error('[Incidents] My incidents load failed:', err);
+        list.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-primary);">Error loading reports.</div>';
     }
 }

@@ -26,4 +26,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody AuthRequest request) {
         return ResponseEntity.ok(userService.login(request));
     }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String> verifyEmail(@RequestParam String code) {
+        try {
+            String message = userService.verifyEmail(code);
+            return ResponseEntity.ok(message);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

@@ -58,7 +58,7 @@ async function handleLogin(e) {
 
         window.location.href = 'dashboard.html';
     } catch (err) {
-        alert(err.message || 'Login failed. Please check your credentials.');
+        showToast(err.message || 'Login failed. Please check your credentials.', 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = 'Sign In';
@@ -85,16 +85,12 @@ async function handleRegister(e) {
             }),
         });
 
-        localStorage.setItem(CONFIG.TOKEN_KEY, data.token);
-        localStorage.setItem(CONFIG.USER_KEY, JSON.stringify({
-            id: data.id,
-            name: data.name,
-            email: data.email,
-        }));
-
-        window.location.href = 'dashboard.html';
+        showToast(data.message || 'Registration successful! Please log in.', 'success');
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
     } catch (err) {
-        alert(err.message || 'Registration failed. Please try again.');
+        showToast(err.message || 'Registration failed. Please try again.', 'error');
     } finally {
         btn.disabled = false;
         btn.textContent = 'Create Account';

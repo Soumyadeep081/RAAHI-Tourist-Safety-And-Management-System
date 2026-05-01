@@ -32,6 +32,7 @@ public class Incident {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('REPORTED','INVESTIGATING','RESOLVED') DEFAULT 'REPORTED'")
+    @Builder.Default
     private IncidentStatus status = IncidentStatus.REPORTED;
 
     @Column(name = "created_at", updatable = false)

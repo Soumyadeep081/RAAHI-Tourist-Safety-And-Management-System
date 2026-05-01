@@ -44,7 +44,7 @@ async function triggerSOS() {
         loadMyAlerts();
         loadDashboardStats();
     } catch (err) {
-        showToast('Failed to send SOS: ' + err.message, 'error');
+        showToast('🚨 SOS queued locally. Searching for network...', 'warning');
         OfflineManager.enqueue('sos', payload);
     }
 
@@ -98,7 +98,7 @@ async function sendSOSWithMessage(e) {
         loadMyAlerts();
         loadDashboardStats();
     } catch (err) {
-        showToast('Failed to send SOS: ' + err.message, 'error');
+        showToast('🚨 SOS queued locally. Searching for network...', 'warning');
         OfflineManager.enqueue('sos', payload);
     }
 }

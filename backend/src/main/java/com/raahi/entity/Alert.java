@@ -19,10 +19,12 @@ public class Alert {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('SOS','WARNING','INFO') DEFAULT 'SOS'")
+    @Builder.Default
     private AlertType type = AlertType.SOS;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('ACTIVE','RESOLVED','EXPIRED') DEFAULT 'ACTIVE'")
+    @Builder.Default
     private AlertStatus status = AlertStatus.ACTIVE;
 
     @Column(nullable = false)

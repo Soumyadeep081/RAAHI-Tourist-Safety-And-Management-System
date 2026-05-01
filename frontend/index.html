@@ -53,9 +53,45 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
             margin-bottom: var(--space-md);
             color: var(--color-primary);
+        }
+
+        /* Scroll Animations */
+        html { scroll-behavior: smooth; }
+        .fade-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .fade-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Reviews */
+        .review-card {
+            background: var(--color-canvas);
+            border: 1px solid var(--color-hairline);
+            border-radius: var(--rounded-lg);
+            padding: var(--space-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+        .review-stars { color: #F59E0B; font-size: 18px; letter-spacing: 2px; }
+        .reviewer { display: flex; align-items: center; gap: 12px; }
+        .reviewer-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-surface-soft); }
+
+        /* Map styling */
+        .world-map-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0.1;
+            background-image: radial-gradient(var(--color-ink) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: 0;
+            border-radius: var(--rounded-lg);
         }
     </style>
 </head>
@@ -73,75 +109,142 @@
             </a>
             
             <div class="nav-links">
-                <a href="about.html" class="nav-link">Our Story</a>
-                <a href="dashboard.html" class="nav-link">How it works</a>
-                <a href="contact.html" class="nav-link">Contact</a>
+                <a href="#about" class="nav-link">Our Story</a>
+                <a href="#features" class="nav-link">How it works</a>
+                <a href="html/help.html" class="nav-link">Contact</a>
             </div>
             
-            <div class="nav-actions">
-                <a href="login.html" class="nav-link">Log in</a>
-                <a href="register.html" class="btn btn-primary btn-pill">Sign up</a>
+            <div class="nav-actions" id="nav-auth-actions">
+                <a href="html/login.html" class="nav-link">Log in</a>
+                <a href="html/register.html" class="btn btn-primary btn-pill">Sign up</a>
             </div>
         </div>
     </nav>
 
     <main>
         <!-- Hero Section -->
-        <section class="hero">
+        <section class="hero fade-up">
             <div class="hero-bg"></div>
             <div class="hero-overlay"></div>
             <div class="container hero-content">
                 <h1 class="text-display-xl hero-title">Explore the world. We've got your back.</h1>
                 <p class="hero-subtitle">Raahi is your premium travel safety companion. Real-time tracking, immediate emergency response, and peace of mind wherever you go.</p>
                 <div class="flex-center" style="justify-content: flex-start; gap: var(--space-md);">
-                    <a href="register.html" class="btn btn-primary">Get started</a>
-                    <a href="about.html" class="btn btn-secondary" style="background: white;">Learn more</a>
+                    <a href="html/register.html" class="btn btn-primary">Get started</a>
+                    <a href="#about" class="btn btn-secondary" style="background: white;">Learn more</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="section container fade-up">
+            <div class="grid-2" style="align-items: center; gap: 80px;">
+                <div>
+                    <h2 class="text-display-lg mb-md">Empowering global explorers.</h2>
+                    <p class="text-body-lg mb-md" style="color: var(--color-muted); line-height: 1.6;">
+                        Founded on the belief that safety should never compromise the spirit of adventure, Raahi was built to provide an invisible layer of protection for travelers. 
+                    </p>
+                    <p class="text-body-lg" style="color: var(--color-muted); line-height: 1.6;">
+                        Whether you're backpacking across continents or on a business trip in a new city, our platform ensures your loved ones are informed and emergency services are just a tap away.
+                    </p>
+                </div>
+                <div style="background: url('https://images.unsplash.com/photo-1527631746610-bca00a040d60?auto=format&fit=crop&q=80&w=800') center/cover no-repeat; border-radius: 24px; height: 400px; position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
                 </div>
             </div>
         </section>
 
         <!-- Features Section -->
-        <section class="section container">
+        <section id="features" class="section container fade-up" style="background: #FAFAFA; padding: 80px 40px; border-radius: 32px; margin-top: 40px;">
             <div class="mb-xl text-center">
                 <h2 class="text-display-lg mb-sm">Travel with confidence</h2>
-                <p class="text-body-lg" style="max-width: 600px; margin: 0 auto;">Designed for the modern traveler, Raahi combines cutting-edge location technology with an intuitive, premium interface.</p>
+                <p class="text-body-lg" style="max-width: 600px; margin: 0 auto; color: var(--color-muted);">Designed for the modern traveler, Raahi combines cutting-edge location technology with an intuitive, premium interface.</p>
             </div>
             
             <div class="grid-3">
-                <div class="card">
-                    <div class="feature-icon">🛡️</div>
+                <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
                     <h3 class="text-title-lg mb-xs">Instant SOS</h3>
-                    <p class="text-body-md">One tap alerts your emergency contacts and local authorities with your precise location.</p>
+                    <p class="text-body-md" style="color: var(--color-muted);">One tap alerts your emergency contacts and local authorities with your precise location.</p>
                 </div>
-                <div class="card">
-                    <div class="feature-icon">📍</div>
+                <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    </div>
                     <h3 class="text-title-lg mb-xs">Live Tracking</h3>
-                    <p class="text-body-md">Share your journey securely with loved ones. They can see your route update in real-time.</p>
+                    <p class="text-body-md" style="color: var(--color-muted);">Share your journey securely with loved ones. They can see your route update in real-time.</p>
                 </div>
-                <div class="card">
-                    <div class="feature-icon">🌐</div>
+                <div class="card" style="border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
+                    </div>
                     <h3 class="text-title-lg mb-xs">Offline Sync</h3>
-                    <p class="text-body-md">No signal? No problem. Raahi queues your updates and syncs the moment you reconnect.</p>
+                    <p class="text-body-md" style="color: var(--color-muted);">No signal? No problem. Raahi queues your updates and syncs the moment you reconnect.</p>
                 </div>
             </div>
         </section>
 
-        <!-- CTA Section -->
-        <section class="section-lg container" style="border-top: 1px solid var(--color-hairline); margin-top: var(--space-section);">
-            <div class="grid-2" style="align-items: center;">
+        <!-- User Reviews Section -->
+        <section class="section container fade-up">
+            <div class="mb-xl">
+                <h2 class="text-display-lg mb-sm text-center">Trusted by explorers worldwide</h2>
+            </div>
+            <div class="grid-3">
+                <div class="review-card">
+                    <div class="review-stars">★★★★★</div>
+                    <p class="text-body-md" style="font-style: italic; flex-grow: 1;">"Raahi gave my family absolute peace of mind while I was backpacking through South America. The offline sync feature is a lifesaver when you lose cell service in remote areas."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar" style="background: url('https://randomuser.me/api/portraits/women/44.jpg') center/cover;"></div>
+                        <div>
+                            <div class="text-body-sm" style="font-weight: 600;">Sarah Jenkins</div>
+                            <div class="text-caption">Solo Traveler</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">★★★★★</div>
+                    <p class="text-body-md" style="font-style: italic; flex-grow: 1;">"The interface is incredibly clean and professional. I use the live tracking feature every time I go on a long hike. It's the one app I never travel without."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar" style="background: url('https://randomuser.me/api/portraits/men/32.jpg') center/cover;"></div>
+                        <div>
+                            <div class="text-body-sm" style="font-weight: 600;">David Chen</div>
+                            <div class="text-caption">Photographer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">★★★★★</div>
+                    <p class="text-body-md" style="font-style: italic; flex-grow: 1;">"Had a medical emergency in a foreign country and the SOS feature immediately alerted my contacts with my exact coordinates. Truly an essential platform."</p>
+                    <div class="reviewer">
+                        <div class="reviewer-avatar" style="background: url('https://randomuser.me/api/portraits/women/68.jpg') center/cover;"></div>
+                        <div>
+                            <div class="text-body-sm" style="font-weight: 600;">Elena Rodriguez</div>
+                            <div class="text-caption">Digital Nomad</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section with Map -->
+        <section class="section-lg container fade-up" style="border-top: 1px solid var(--color-hairline); margin-top: var(--space-section);">
+            <div class="grid-2" style="align-items: center; gap: 60px;">
                 <div>
                     <h2 class="text-display-lg mb-md">Ready for your next adventure?</h2>
-                    <p class="text-body-lg mb-lg">Join thousands of travelers who explore freely, knowing Raahi is there if they need it.</p>
-                    <a href="register.html" class="btn btn-primary">Create your account</a>
+                    <p class="text-body-lg mb-lg" style="color: var(--color-muted);">Join thousands of travelers who explore freely, knowing Raahi is there if they need it.</p>
+                    <a href="html/register.html" id="cta-bottom-btn" class="btn btn-primary" style="padding: 16px 32px; font-size: 16px;">Create your account</a>
                 </div>
-                <div class="card" style="background: var(--color-surface-soft); display: flex; align-items: center; justify-content: center; min-height: 300px;">
-                    <div class="text-center">
-                        <div class="brand-icon" style="width: 64px; height: 64px; margin: 0 auto var(--space-md); font-size: 32px;">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <div class="card" style="background: url('https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&q=80&w=800') center/cover no-repeat; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 350px; position: relative; overflow: hidden; border: none; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                    <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); z-index: 0;"></div>
+                    <div class="text-center" style="position: relative; z-index: 1;">
+                        <div class="brand-icon" style="width: 72px; height: 72px; margin: 0 auto var(--space-md); font-size: 32px; box-shadow: 0 10px 30px rgba(229, 46, 77, 0.4); background: var(--color-primary); color: white;">
+                            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             </svg>
                         </div>
-                        <h3 class="text-title-lg">Raahi Protection</h3>
+                        <h3 class="text-title-lg mb-xs" style="color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Raahi Protection</h3>
+                        <p class="text-body-sm" style="color: rgba(255,255,255,0.9);">Active monitoring & secure routing</p>
                     </div>
                 </div>
             </div>
@@ -153,26 +256,26 @@
             <div class="footer-grid">
                 <div>
                     <h4 class="footer-heading">Support</h4>
-                    <a href="contact.html" class="footer-link">Help Center</a>
-                    <a href="contact.html" class="footer-link">Safety Information</a>
-                    <a href="contact.html" class="footer-link">Cancellation Options</a>
+                    <a href="html/help.html" class="footer-link">Help Center</a>
+                    <a href="html/safety.html" class="footer-link">Safety Information</a>
+                    <a href="html/cancellation.html" class="footer-link">Cancellation Options</a>
                 </div>
                 <div>
                     <h4 class="footer-heading">Company</h4>
-                    <a href="about.html" class="footer-link">About Us</a>
-                    <a href="about.html" class="footer-link">Careers</a>
-                    <a href="about.html" class="footer-link">Investors</a>
+                    <a href="html/about.html" class="footer-link">About Us</a>
+                    <a href="html/careers.html" class="footer-link">Careers</a>
+                    <a href="html/investors.html" class="footer-link">Investors</a>
                 </div>
                 <div>
                     <h4 class="footer-heading">Platform</h4>
-                    <a href="dashboard.html" class="footer-link">Dashboard</a>
-                    <a href="tracking.html" class="footer-link">Live Tracking</a>
-                    <a href="sos.html" class="footer-link">SOS Emergency</a>
+                    <a href="html/dashboard.html" class="footer-link">Dashboard</a>
+                    <a href="html/tracking.html" class="footer-link">Live Tracking</a>
+                    <a href="html/sos.html" class="footer-link">SOS Emergency</a>
                 </div>
                 <div>
                     <h4 class="footer-heading">Legal</h4>
-                    <a href="terms.html" class="footer-link">Terms of Service</a>
-                    <a href="privacy.html" class="footer-link">Privacy Policy</a>
+                    <a href="html/terms.html" class="footer-link">Terms of Service</a>
+                    <a href="html/privacy.html" class="footer-link">Privacy Policy</a>
                 </div>
             </div>
             
@@ -186,5 +289,34 @@
         </div>
     </footer>
 
+    <script src="js/config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (isAuthenticated()) {
+                const navActions = document.getElementById('nav-auth-actions');
+                if (navActions) {
+                    navActions.innerHTML = '<a href="html/dashboard.html" class="btn btn-primary btn-pill">Go to Dashboard</a>';
+                }
+                const ctaBtn = document.getElementById('cta-bottom-btn');
+                if (ctaBtn) {
+                    ctaBtn.textContent = 'Go to Dashboard';
+                    ctaBtn.href = 'html/dashboard.html';
+                }
+            }
+
+            // Scroll Animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.fade-up').forEach((el) => {
+                observer.observe(el);
+            });
+        });
+    </script>
 </body>
 </html>

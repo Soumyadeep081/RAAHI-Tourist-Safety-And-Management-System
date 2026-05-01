@@ -9,6 +9,7 @@ import java.util.List;
 public interface AlertRepository extends JpaRepository<Alert, Long> {
 
     List<Alert> findByUserIdOrderByCreatedAtDesc(Long userId);
+    long countByUserIdAndStatus(Long userId, Alert.AlertStatus status);
 
     List<Alert> findByStatusOrderByCreatedAtDesc(Alert.AlertStatus status);
 

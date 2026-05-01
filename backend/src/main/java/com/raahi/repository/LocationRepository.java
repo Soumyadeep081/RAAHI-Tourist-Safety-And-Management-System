@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findTop50ByUserIdOrderByRecordedAtDesc(Long userId);
+    long countByUserId(Long userId);
 }

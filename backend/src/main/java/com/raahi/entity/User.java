@@ -27,6 +27,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('TOURIST','ADMIN') DEFAULT 'TOURIST'")
+    @Builder.Default
     private Role role = Role.TOURIST;
 
     @Column(name = "created_at", updatable = false)
@@ -34,6 +35,13 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "is_verified", nullable = false)
+    @Builder.Default
+    private boolean isVerified = false;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
 
     @PrePersist
     protected void onCreate() {

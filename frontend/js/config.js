@@ -27,7 +27,7 @@ async function apiFetch(endpoint, options = {}) {
         headers,
     });
 
-    if (res.status === 401) {
+    if (res.status === 401 || res.status === 403) {
         // Token expired or invalid – redirect to login
         localStorage.removeItem(CONFIG.TOKEN_KEY);
         localStorage.removeItem(CONFIG.USER_KEY);

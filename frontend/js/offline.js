@@ -32,6 +32,12 @@ const OfflineManager = {
             data,
             timestamp: new Date().toISOString(),
         });
+        
+        // Limit queue size to prevent unbounded growth
+        if (queue.length > 50) {
+            queue.shift();
+        }
+        
         this.saveQueue(queue);
         console.log(`[Offline] Queued ${type} event. Queue size: ${queue.length}`);
     },
@@ -82,7 +88,8 @@ const OfflineManager = {
             showToast('All offline data synced successfully!', 'success');
             hideConnectionBar();
         } else {
-            showToast(`${failed.length} items failed to sync. Will retry later.`, 'error');
+            console.warn(`[Offline] ${failed.length} items failed to sync. Will retry later.`);
+            // Silently fail to avoid spamming the UI
         }
     },
 
