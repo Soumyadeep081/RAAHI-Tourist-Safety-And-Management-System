@@ -150,6 +150,23 @@ async function loadLocationHistory() {
             return;
         }
 
+        // Update overview stat
+        const statEl = document.getElementById('stat-locations');
+        if (statEl) statEl.textContent = data.length;
+
+        list.innerHTML = data.slice(0, 20).map(loc => `
+            <div class="list-item">
+                <div class="list-item-info">
+                    <h4>📍 ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}</h4>
+                    <p>Accuracy: ${loc.accuracy ? loc.accuracy.toFixed(1) + 'm' : '—'} • ${formatTime(loc.timestamp)}</p>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error('[Location] History load failed:', err);
+    }
+}
+
 /**
  * Share the current location via clipboard.
  */
@@ -177,19 +194,3 @@ function shareLocation() {
     }
 }
 
-        // Update overview stat
-        const statEl = document.getElementById('stat-locations');
-        if (statEl) statEl.textContent = data.length;
-
-        list.innerHTML = data.slice(0, 20).map(loc => `
-            <div class="list-item">
-                <div class="list-item-info">
-                    <h4>📍 ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}</h4>
-                    <p>Accuracy: ${loc.accuracy ? loc.accuracy.toFixed(1) + 'm' : '—'} • ${formatTime(loc.timestamp)}</p>
-                </div>
-            </div>
-        `).join('');
-    } catch (err) {
-        console.error('[Location] History load failed:', err);
-    }
-}

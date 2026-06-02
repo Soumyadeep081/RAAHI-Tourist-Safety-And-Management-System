@@ -32,31 +32,30 @@ public class UserService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .phone(request.getPhone())
                 .role(User.Role.TOURIST)
-                .isVerified(false)
+                .isVerified(true)
                 .verificationCode(verificationCode)
                 .build();
 
         user = userRepository.save(user);
 
         System.out.println("==================================================");
-        System.out.println("Registration successful. Please verify your email.");
-        System.out.println("Verification Link: http://localhost:8080/api/auth/verify?code=" + verificationCode);
+        System.out.println("Registration successful. Account automatically verified.");
         System.out.println("==================================================");
         
-        emailService.sendVerificationEmail(user.getEmail(), user.getName(), verificationCode);
+        try {
+            emailService.sendVerificationEmail(user.getEmail(), user.getName(), verificationCode);
+        } catch (Exception e) {
+            // Ignore email errors to prevent blocking registration
+        }
 
         return AuthResponse.builder()
-                .message("Registration successful. Please check your email to verify your account.")
+                .message("Registration successful. You can now log in.")
                 .build();
     }
 
     public AuthResponse login(AuthRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-
-        if (!user.isVerified()) {
-            throw new RuntimeException("Please verify your email before logging in. Check your console for the link.");
-        }
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid email or password");

@@ -213,11 +213,127 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(0,0,0,0.04);
+            border-bottom: 1px solid var(--color-hairline-soft);
             transition: background 0.2s ease;
         }
-        .list-card:hover { background: #F8FAFC; }
+        .list-card:hover { background: var(--color-surface-soft); }
         .list-card:last-child { border-bottom: none; }
+
+        .list-item {
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-hairline-soft);
+            transition: background 0.2s ease;
+            background: transparent;
+        }
+        .list-item:hover {
+            background: var(--color-surface-soft);
+        }
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        .list-item-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--color-ink);
+            margin-bottom: 4px;
+        }
+        .list-item-info p {
+            font-size: 13px;
+            color: var(--color-muted);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .badge-active {
+            background: rgba(229, 46, 77, 0.1);
+            color: var(--color-primary);
+        }
+        .badge-resolved {
+            background: rgba(0, 138, 5, 0.1);
+            color: var(--color-success);
+        }
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: #D97706;
+        }
+
+        .empty-state {
+            padding: 40px 24px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .empty-state-icon {
+            font-size: 40px;
+            opacity: 0.6;
+            margin-bottom: 4px;
+        }
+
+        .btn-icon-danger {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s, transform 0.15s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-icon-danger:hover {
+            background: rgba(229, 46, 77, 0.1);
+            transform: scale(1.05);
+        }
+        .btn-icon-danger:active {
+            transform: scale(0.95);
+        }
+
+        .diagnostic-card {
+            padding: 24px;
+            background: var(--color-surface-soft);
+            border-radius: 16px;
+            border: 1px solid var(--color-hairline-soft);
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--color-ink);
+            border: 1px solid var(--color-hairline);
+            transition: all 0.2s;
+        }
+        .btn-outline:hover {
+            background: var(--color-surface-soft);
+            border-color: var(--color-ink);
+        }
+        body.dark-theme .btn-outline {
+            border-color: var(--color-hairline);
+            color: var(--color-ink);
+        }
+        body.dark-theme .btn-outline:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--color-ink);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+            border-radius: 8px;
+        }
         
         /* Map Container */
         #tracking-map {
@@ -503,7 +619,16 @@
             background: #1E293B;
             border-color: rgba(255,255,255,0.05);
         }
-        body.dark-theme #contacts-list { background: #1E293B !important; }
+        body.dark-theme .avatar {
+            background: linear-gradient(135deg, var(--color-surface-strong), var(--color-surface-soft));
+            color: var(--color-primary);
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.05), 0 2px 8px rgba(0,0,0,0.2);
+        }
+        body.dark-theme #contacts-list,
+        body.dark-theme #my-alerts-list,
+        body.dark-theme #my-incidents-list {
+            background: transparent !important;
+        }
         body.dark-theme .premium-card-body { background: #1E293B !important; }
         body.dark-theme .input-field {
             background: rgba(15, 23, 42, 0.5);
@@ -533,6 +658,7 @@
             <div class="product-tabs">
                 <button class="product-tab active" onclick="switchMainTab('overview', this)">Overview</button>
                 <button class="product-tab" onclick="switchMainTab('tracking', this)">Live Tracking</button>
+                <button class="product-tab" onclick="switchMainTab('geofencing', this)">Safety Zones</button>
                 <button class="product-tab" onclick="switchMainTab('sos', this)">SOS Emergency</button>
             </div>
             
@@ -633,19 +759,19 @@
                             <p class="text-body-sm">People notified during an SOS.</p>
                         </div>
                     </div>
-                    <div id="contacts-list" style="max-height: 280px; overflow-y: auto; background: #fff;">
+                    <div id="contacts-list" style="max-height: 280px; overflow-y: auto;">
                         <div style="padding: 60px 40px; text-align: center; color: var(--color-muted);">
                             <div style="font-size: 40px; opacity: 0.5; margin-bottom: 12px;">👤</div>
                             <p>Loading your network...</p>
                         </div>
                     </div>
-                    <div class="premium-card-body" style="background: var(--color-surface-soft); border-top: 1px solid rgba(0,0,0,0.05);">
+                    <div class="premium-card-body" style="border-top: 1px solid var(--color-hairline);">
                         <form id="contact-form" onsubmit="addContact(event)">
                             <div class="grid-2 gap-sm mb-md">
                                 <input type="text" id="contact-name" class="input-field" placeholder="Full Name" required>
                                 <input type="tel" id="contact-phone" class="input-field" placeholder="Phone Number" required>
                             </div>
-                            <button type="submit" class="btn w-full" style="background: var(--color-canvas); border: 1px solid var(--color-hairline); color: var(--color-ink); box-shadow: var(--shadow-subtle);">+ Add Trusted Contact</button>
+                            <button type="submit" class="btn btn-secondary w-full">+ Add Trusted Contact</button>
                         </form>
                     </div>
                 </div>
@@ -659,7 +785,7 @@
                         </div>
                         <span style="background: rgba(229,46,77,0.1); color: var(--color-primary); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700;">Secure Form</span>
                     </div>
-                    <div class="premium-card-body" style="background: var(--color-canvas);">
+                    <div class="premium-card-body">
                         <form id="incident-form" onsubmit="reportIncident(event)">
                             <div class="input-group mb-md">
                                 <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Category</label>
@@ -680,11 +806,11 @@
                             <button type="submit" class="btn btn-primary w-full" style="padding: 16px; font-size: 16px; border-radius: 12px; box-shadow: 0 4px 15px rgba(229,46,77,0.3);">Submit Report Anonymously</button>
                         </form>
                     </div>
-                    <div class="premium-card-header flex-between" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 24px; padding-bottom: 16px;">
-                        <h3 class="text-title-md" style="font-size: 15px;">Your Recent Reports</h3>
+                    <div class="flex-between" style="border-top: 1px solid var(--color-hairline); padding: 24px 32px 16px;">
+                        <h3 class="text-title-md" style="font-size: 15px; color: var(--color-ink);">Your Recent Reports</h3>
                         <span style="font-size: 12px; color: var(--color-muted);">LIVE SYNC</span>
                     </div>
-                    <div id="my-incidents-list" style="max-height: 200px; overflow-y: auto; background: var(--color-canvas);">
+                    <div id="my-incidents-list" style="max-height: 200px; overflow-y: auto;">
                         <div style="padding: 32px; text-align: center; color: var(--color-muted);">No recent incident reports.</div>
                     </div>
                 </div>
@@ -699,17 +825,24 @@
             </div>
 
             <div class="tracking-status-card mb-xl reveal" style="transition-delay: 0.1s;">
-                <div class="flex-between" style="position: relative; z-index: 2;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: center; gap: var(--space-xl);">
                     <div>
                         <div class="text-caption mb-xs" style="color: rgba(255,255,255,0.7);">CURRENT POSITION (UPDATED LIVE)</div>
-                        <div class="text-display-md font-mono" style="margin-top: 8px; font-size: 28px;">
+                        <div class="text-title-lg font-mono" style="margin-top: 8px; font-size: 20px; line-height: 1.4; color: white;">
                             <span class="pulse-dot"></span> 
-                            Lat: <span id="loc-lat">—</span> &nbsp; Lng: <span id="loc-lng">—</span>
+                            Lat: <span id="loc-lat">—</span><br>
+                            Lng: <span id="loc-lng">—</span>
+                        </div>
+                    </div>
+                    <div class="text-center" style="border-left: 1px solid rgba(255,255,255,0.15); border-right: 1px solid rgba(255,255,255,0.15); padding: 0 24px;">
+                        <div class="text-caption mb-xs" style="color: rgba(255,255,255,0.7);">CURRENT SAFETY ZONE</div>
+                        <div id="current-zone-badge" class="badge badge-resolved" style="font-size: 15px; padding: 10px 24px; border-radius: 30px; margin-top: 8px; font-weight: 800; display: inline-block;">
+                            💚 Safe Zone
                         </div>
                     </div>
                     <div class="text-right">
                         <div class="text-caption mb-xs" style="color: rgba(255,255,255,0.7);">GPS ACCURACY</div>
-                        <div class="text-display-md" style="font-size: 32px;"><span id="loc-acc">—</span><span style="font-size: 20px; opacity: 0.8;">m</span></div>
+                        <div class="text-display-md" style="font-size: 32px; font-weight: 800; color: white;"><span id="loc-acc">—</span><span style="font-size: 20px; opacity: 0.8;">m</span></div>
                     </div>
                 </div>
             </div>
@@ -727,7 +860,20 @@
                 </div>
             </div>
 
-            <div class="grid-2 reveal" style="transition-delay: 0.3s;">
+            <div class="grid-3 reveal" style="transition-delay: 0.3s;">
+                <!-- Nearby Zones Widget -->
+                <div class="premium-card">
+                    <div class="premium-card-header flex-between">
+                        <h2 class="text-title-lg">Nearby Safety Zones</h2>
+                        <span style="font-size: 12px; color: var(--color-muted);">GEO-FENCING</span>
+                    </div>
+                    <div class="premium-card-body" id="nearby-zones-list" style="height: 350px; overflow-y: auto; padding: 0;">
+                        <div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--color-muted);">
+                            <p class="text-body-md">Determining nearby zones...</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="premium-card">
                     <div class="premium-card-header">
                         <h2 class="text-title-lg">Location History Log</h2>
@@ -738,24 +884,144 @@
                         </div>
                     </div>
                 </div>
+                
                 <div class="premium-card">
                     <div class="premium-card-header">
                         <h2 class="text-title-lg">System Diagnostics</h2>
                     </div>
-                    <div class="premium-card-body">
-                        <div class="mb-lg" style="padding: 24px; background: #F8FAFC; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05);">
+                    <div class="premium-card-body" style="height: 350px;">
+                        <div class="diagnostic-card mb-md">
                             <div class="text-caption mb-sm">TRACKING ENGINE STATUS</div>
-                            <div class="text-title-lg" id="status-text" style="color: #22c55e; display:flex; align-items:center; gap: 12px; font-size: 24px;">
-                                <span class="pulse-dot" style="width: 16px; height: 16px;"></span> Active & Secure
+                            <div class="text-title-lg" id="status-text" style="color: #22c55e; display:flex; align-items:center; gap: 12px; font-size: 20px;">
+                                <span class="pulse-dot" style="width: 14px; height: 14px;"></span> Active & Secure
                             </div>
                         </div>
-                        <div style="padding: 24px; background: #F8FAFC; border-radius: 16px; border: 1px solid rgba(0,0,0,0.05);">
+                        <div class="diagnostic-card">
                             <div class="text-caption mb-sm">OFFLINE SYNC QUEUE</div>
-                            <div class="text-title-lg" id="queue-count" style="font-size: 36px; font-weight: 800; color: var(--color-ink);">0</div>
+                            <div class="text-title-lg" id="queue-count" style="font-size: 32px; font-weight: 800; color: var(--color-ink);">0</div>
                             <p class="text-body-sm mt-xs" style="color: var(--color-muted);">Data points waiting for internet connection.</p>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- GEOFENCING HUB SECTION -->
+        <div id="tab-geofencing" class="section-container">
+            <div class="welcome-header reveal">
+                <h1 class="text-display-lg mb-xs">Safety Zones & Geofencing Hub</h1>
+                <p class="text-body-lg" style="color: var(--color-muted);">Configure secure perimeters and monitor nearby high-risk or protected zones.</p>
+            </div>
+
+            <!-- Main Row -->
+            <div class="grid-3 reveal" style="transition-delay: 0.1s; margin-bottom: var(--space-xl);">
+                
+                <!-- Zone Status Card -->
+                <div class="premium-card">
+                    <div class="premium-card-header">
+                        <h2 class="text-title-lg">Active Security Monitor</h2>
+                    </div>
+                    <div class="premium-card-body">
+                        <div id="geofencing-hud-status" class="mb-lg p-xl border-round" style="border-radius: 16px; text-align: center; background: rgba(34, 197, 94, 0.08); border: 1px solid rgba(34, 197, 94, 0.2); transition: all 0.3s; padding: 24px;">
+                            <div style="font-size: 54px; margin-bottom: 12px;">🛡️</div>
+                            <div style="font-size: 13px; text-transform: uppercase; font-weight: 700; color: var(--color-muted); margin-bottom: 6px;">MONITORING STATUS</div>
+                            <div id="geofence-hud-label" style="font-size: 24px; font-weight: 800; color: #22c55e;">Green - Safe</div>
+                            <p id="geofence-hud-desc" class="text-body-sm mt-xs" style="color: var(--color-muted);">You are currently in a secure zone. No incidents reported.</p>
+                        </div>
+                        
+                        <div class="diagnostic-card">
+                            <div class="text-caption mb-sm">ACTIVE MONITOR PERIMETERS</div>
+                            <div style="font-size: 28px; font-weight: 800; color: var(--color-ink);" id="active-perimeters-count">4</div>
+                            <p class="text-body-sm mt-xs" style="color: var(--color-muted);">Geofences synchronized from server database.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Zone Configuration Form -->
+                <div class="premium-card" style="grid-column: span 2;">
+                    <div class="premium-card-header flex-between">
+                        <h2 class="text-title-lg">Configure Custom Security Perimeter</h2>
+                        <span style="background: rgba(229,46,77,0.08); color: var(--color-primary); padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">Custom Geofence</span>
+                    </div>
+                    <div class="premium-card-body">
+                        <form id="custom-geofence-form" onsubmit="createCustomGeofence(event)">
+                            <div class="grid-2 gap-md mb-md" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                <div>
+                                    <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Zone Name</label>
+                                    <input type="text" id="gf-name" class="input-field w-full" placeholder="e.g., Hotel Safe Perimeter" required>
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Zone Hazard Category</label>
+                                    <select id="gf-type" class="input-field w-full" required style="cursor: pointer; padding: 12px;">
+                                        <option value="GREEN" selected>Safe Area (Green)</option>
+                                        <option value="YELLOW">Care Needed (Yellow)</option>
+                                        <option value="RED">Restricted / Danger (Red)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid-3 gap-md mb-lg" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                                <div>
+                                    <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Latitude</label>
+                                    <input type="number" step="any" id="gf-lat" class="input-field w-full" placeholder="28.6139" required>
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Longitude</label>
+                                    <input type="number" step="any" id="gf-lng" class="input-field w-full" placeholder="77.2090" required>
+                                </div>
+                                <div>
+                                    <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Radius (meters)</label>
+                                    <input type="number" id="gf-radius" class="input-field w-full" placeholder="e.g., 300" required>
+                                </div>
+                            </div>
+                            <div class="mb-lg" style="margin-bottom: 24px;">
+                                <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted); text-transform: uppercase;">Perimeter Safety Instructions</label>
+                                <input type="text" id="gf-desc" class="input-field w-full" placeholder="e.g., Stay within 300m of the hotel compound at night." required>
+                            </div>
+                            <div class="flex-between" style="display: flex; justify-content: space-between; align-items: center;">
+                                <button type="button" class="btn btn-outline" onclick="setCurrentCoords()" style="padding: 12px 20px;">📍 Autofill Live GPS</button>
+                                <button type="submit" class="btn btn-primary" style="padding: 12px 28px; box-shadow: 0 4px 15px rgba(229,46,77,0.25);">Create Safety Perimeter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Bottom Row: Real Data & Registered Geofences -->
+            <div class="grid-3 reveal" style="transition-delay: 0.2s;">
+                
+                <!-- Safety Zones list -->
+                <div class="premium-card" style="grid-column: span 2;">
+                    <div class="premium-card-header flex-between">
+                        <h2 class="text-title-lg">Registered Perimeters & Zones</h2>
+                        <span style="font-size: 12px; color: var(--color-muted);">DATABASE LIST</span>
+                    </div>
+                    <div class="premium-card-body" style="padding: 0;">
+                        <div id="full-geofence-table-container" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Will be populated dynamically -->
+                            <div style="padding: 32px; text-align: center; color: var(--color-muted);">
+                                Loading active perimeters...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Real Nearby Locations and Services (Delhi GPS context or Live GPS) -->
+                <div class="premium-card">
+                    <div class="premium-card-header flex-between">
+                        <h2 class="text-title-lg">Nearby Safety Services</h2>
+                        <span style="font-size: 12px; color: var(--color-muted); font-weight: 600; color: #22c55e;">ONLINE</span>
+                    </div>
+                    <div class="premium-card-body" style="padding: 0;">
+                        <div id="nearby-services-list" style="max-height: 400px; overflow-y: auto;">
+                            <!-- Static real landmarks of Delhi categorized and dynamic calculations -->
+                            <div style="padding: 32px; text-align: center; color: var(--color-muted);">
+                                Computing nearest safety stations...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
@@ -779,21 +1045,21 @@
                     </button>
                 </div>
 
-                <div class="premium-card mt-xl" style="width: 100%; max-width: 600px; background: rgba(255,255,255,0.9); backdrop-filter: blur(20px);">
+                <div class="premium-card mt-xl" style="width: 100%; max-width: 600px;">
                     <div class="premium-card-body" style="padding: 32px;">
                         <form id="sos-form" onsubmit="sendSOSWithMessage(event)">
                             <div class="input-group mb-lg">
-                                <label class="text-caption" style="display: block; margin-bottom: 12px; font-size: 12px;">OPTIONAL DISTRESS MESSAGE</label>
+                                <label class="text-caption" style="display: block; margin-bottom: 12px; font-size: 12px; color: var(--color-muted);">OPTIONAL DISTRESS MESSAGE</label>
                                 <textarea id="sos-message" class="input-field w-full" rows="3" placeholder="What kind of help do you need? (e.g., Medical assistance required, Security threat)"></textarea>
                             </div>
-                            <button type="submit" class="btn btn-primary w-full" style="padding: 18px; border-radius: 14px; font-size: 16px; font-weight: 700; background: var(--color-trust); box-shadow: 0 4px 15px rgba(10,37,64,0.3);">Send Emergency Alert Quietly</button>
+                            <button type="submit" class="btn btn-primary w-full" style="padding: 18px; border-radius: 14px; font-size: 16px; font-weight: 700; box-shadow: 0 4px 15px rgba(229,46,77,0.3);">Send Emergency Alert Quietly</button>
                         </form>
                     </div>
-                    <div class="premium-card-header flex-between" style="border-top: 1px solid rgba(0,0,0,0.05); padding-top: 24px; padding-bottom: 16px;">
-                        <h2 class="text-title-md" style="font-size: 16px;">Your Active Alerts</h2>
+                    <div class="flex-between" style="border-top: 1px solid var(--color-hairline); padding: 24px 32px 16px;">
+                        <h2 class="text-title-md" style="font-size: 16px; color: var(--color-ink);">Your Active Alerts</h2>
                         <span style="font-size: 12px; color: var(--color-muted);">LIVE SYNC</span>
                     </div>
-                    <div id="my-alerts-list" style="max-height: 250px; overflow-y: auto; background: var(--color-canvas);">
+                    <div id="my-alerts-list" style="max-height: 250px; overflow-y: auto;">
                         <div style="padding: 32px; text-align: center; color: var(--color-muted);">No active alerts. Stay safe!</div>
                     </div>
                 </div>
@@ -816,9 +1082,13 @@
                         <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted);">FULL NAME</label>
                         <input type="text" id="setting-name" class="input-field w-full" required>
                     </div>
+                    <div class="mb-md">
+                        <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted);">PHONE NUMBER</label>
+                        <input type="tel" id="setting-phone" class="input-field w-full" placeholder="Enter your phone number">
+                    </div>
                     <div class="mb-xl">
                         <label style="display:block; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: var(--color-muted);">EMAIL ADDRESS</label>
-                        <input type="email" id="setting-email" class="input-field w-full" disabled style="background: #f1f5f9; cursor: not-allowed;" title="Email cannot be changed">
+                        <input type="email" id="setting-email" class="input-field w-full" disabled style="background: var(--color-surface-soft); cursor: not-allowed;" title="Email cannot be changed">
                     </div>
                     <button type="submit" class="btn btn-primary w-full" style="padding: 16px;">Save Changes</button>
                 </form>
@@ -922,6 +1192,7 @@
                 if (user) {
                     document.getElementById('setting-name').value = user.name || '';
                     document.getElementById('setting-email').value = user.email || '';
+                    document.getElementById('setting-phone').value = user.phone || '';
                 }
             } else if (title === 'Privacy & Security') {
                 document.getElementById('privacy-security-form').style.display = 'block';
@@ -943,37 +1214,58 @@
             document.getElementById('settings-modal-overlay').classList.remove('show');
         }
 
-        function saveSettings(event) {
+        async function saveSettings(event) {
             event.preventDefault();
             const newName = document.getElementById('setting-name').value;
-            const user = getCurrentUser();
-            if (user) {
-                user.name = newName;
-                localStorage.setItem('raahi_user', JSON.stringify(user));
+            const newPhone = document.getElementById('setting-phone').value;
+            
+            try {
+                const response = await apiFetch('/users/profile', {
+                    method: 'PUT',
+                    body: JSON.stringify({ name: newName, phone: newPhone })
+                });
                 
-                // Update UI elements instantly
-                document.getElementById('dropdown-name').textContent = user.name;
-                document.getElementById('user-avatar').textContent = user.name;
-                document.getElementById('overview-name').textContent = user.name.split(' ')[0];
-                
-                // Re-initialize avatar if dashboard.js had set it
-                const avatarEl = document.getElementById('user-avatar');
-                if (avatarEl) avatarEl.textContent = user.name;
+                const user = getCurrentUser();
+                if (user) {
+                    user.name = response.name;
+                    user.phone = response.phone;
+                    localStorage.setItem('raahi_user', JSON.stringify(user));
+                    
+                    // Update UI elements instantly
+                    document.getElementById('dropdown-name').textContent = user.name;
+                    document.getElementById('user-avatar').textContent = user.name;
+                    document.getElementById('overview-name').textContent = user.name.split(' ')[0];
+                }
+                closeSettingsModal();
+                showToast('Profile updated successfully! ✅', 'success');
+            } catch (err) {
+                console.error('[Settings] Profile update failed:', err);
+                showToast('Failed to update profile: ' + err.message, 'error');
             }
-            closeSettingsModal();
-            showToast('Profile updated successfully! ✅', 'success');
         }
 
-        function savePrivacySettings(event) {
+        async function savePrivacySettings(event) {
             event.preventDefault();
+            const currentPassword = document.getElementById('setting-current-password').value;
             const newPassword = document.getElementById('setting-new-password').value;
             const confirmPassword = document.getElementById('setting-confirm-password').value;
+            
             if (newPassword !== confirmPassword) {
                 showToast('Passwords do not match! ❌', 'error');
                 return;
             }
-            closeSettingsModal();
-            showToast('Password updated successfully! 🔒', 'success');
+            
+            try {
+                await apiFetch('/users/password', {
+                    method: 'PUT',
+                    body: JSON.stringify({ currentPassword, newPassword })
+                });
+                closeSettingsModal();
+                showToast('Password updated successfully! 🔒', 'success');
+            } catch (err) {
+                console.error('[Settings] Password update failed:', err);
+                showToast(err.message || 'Failed to update password. ❌', 'error');
+            }
         }
 
         function saveNotificationSettings(event) {
@@ -1031,13 +1323,184 @@
             document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
         });
 
+        // Geofencing data structures
+        let loadedGeofences = [];
+        let geofenceCircles = [];
+        let previousSafetyZone = null;
+
+        function loadAndDrawGeofences() {
+            if (!trackingMap) return;
+
+            // Clear old circles
+            geofenceCircles.forEach(c => trackingMap.removeLayer(c));
+            geofenceCircles = [];
+
+            apiFetch('/geofences')
+                .then(zones => {
+                    loadedGeofences = zones;
+                    zones.forEach(zone => {
+                        let color = '#22c55e'; // Green
+                        if (zone.zoneType === 'RED') color = '#ef4444'; // Red
+                        else if (zone.zoneType === 'YELLOW') color = '#f59e0b'; // Yellow
+
+                        const circle = L.circle([zone.latitude, zone.longitude], {
+                            color: color,
+                            fillColor: color,
+                            fillOpacity: 0.12,
+                            weight: 1.5,
+                            radius: zone.radius
+                        }).addTo(trackingMap);
+
+                        circle.bindPopup(`<strong>${zone.name}</strong><br>${zone.description}`);
+                        geofenceCircles.push(circle);
+                    });
+
+                    // Trigger initial proximity check
+                    if (typeof currentPosition !== 'undefined' && currentPosition.latitude) {
+                        checkGeofences(currentPosition.latitude, currentPosition.longitude);
+                    }
+                })
+                .catch(err => console.error('[Geofencing] Failed to load zones:', err));
+        }
+
+        // Haversine distance in meters
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371000; // Radius of Earth in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        function checkGeofences(lat, lng) {
+            if (!loadedGeofences || loadedGeofences.length === 0) return;
+
+            let activeZone = null;
+            let nearbyList = [];
+
+            loadedGeofences.forEach(zone => {
+                const dist = calculateDistance(lat, lng, zone.latitude, zone.longitude);
+                const inside = dist <= zone.radius;
+
+                nearbyList.push({
+                    name: zone.name,
+                    zoneType: zone.zoneType,
+                    description: zone.description,
+                    distance: dist,
+                    inside: inside
+                });
+
+                // Prioritize RED over YELLOW over GREEN for active zone
+                if (inside) {
+                    if (!activeZone || 
+                        (zone.zoneType === 'RED') || 
+                        (zone.zoneType === 'YELLOW' && activeZone.zoneType === 'GREEN')) {
+                        activeZone = zone;
+                    }
+                }
+            });
+
+            // Update safety status badge
+            const badge = document.getElementById('current-zone-badge');
+            if (badge) {
+                if (activeZone) {
+                    badge.innerHTML = activeZone.zoneType === 'RED' ? '🚨 Danger / Restricted' : '⚠️ Care Needed';
+                    badge.className = 'badge ' + (activeZone.zoneType === 'RED' ? 'badge-active' : 'badge-warning');
+                    
+                    // Alert on transition into new hazard zone
+                    if (previousSafetyZone !== activeZone.name) {
+                        previousSafetyZone = activeZone.name;
+                        showToast(`⚠️ Warning: Entered safety hazard zone: ${activeZone.name}!`, 'error');
+                        triggerAlertSound();
+                    }
+                } else {
+                    badge.innerHTML = '💚 Safe Zone';
+                    badge.className = 'badge badge-resolved';
+                    previousSafetyZone = null;
+                }
+            }
+
+            // Update nearby safety zones panel
+            const nearbyContainer = document.getElementById('nearby-zones-list');
+            if (nearbyContainer) {
+                // Sort by distance ascending
+                nearbyList.sort((a, b) => a.distance - b.distance);
+
+                nearbyContainer.innerHTML = nearbyList.map(item => {
+                    let badgeClass = 'badge-resolved';
+                    let icon = '💚';
+                    if (item.zoneType === 'RED') {
+                        badgeClass = 'badge-active';
+                        icon = '🚨';
+                    } else if (item.zoneType === 'YELLOW') {
+                        badgeClass = 'badge-warning';
+                        icon = '⚠️';
+                    }
+
+                    const distText = item.distance < 1000 ? 
+                        `${Math.round(item.distance)}m` : 
+                        `${(item.distance / 1000).toFixed(1)}km`;
+
+                    return `
+                        <div class="list-item">
+                            <div class="list-item-info" style="flex: 1; padding-right: 12px;">
+                                <h4>${icon} ${item.name} ${item.inside ? '<span class="badge badge-active" style="padding: 2px 6px; font-size:9px; margin-left:6px; vertical-align: middle;">INSIDE</span>' : ''}</h4>
+                                <p style="font-size: 12px; margin-top: 4px;">${item.description}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="badge ${badgeClass}">${distText}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        function triggerAlertSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Beep 1
+                const osc1 = audioCtx.createOscillator();
+                const gain1 = audioCtx.createGain();
+                osc1.connect(gain1);
+                gain1.connect(audioCtx.destination);
+                osc1.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(880, audioCtx.currentTime);
+                gain1.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                osc1.start();
+                osc1.stop(audioCtx.currentTime + 0.3);
+
+                // Beep 2 (delayed)
+                setTimeout(() => {
+                    const osc2 = audioCtx.createOscillator();
+                    const gain2 = audioCtx.createGain();
+                    osc2.connect(gain2);
+                    gain2.connect(audioCtx.destination);
+                    osc2.type = 'sawtooth';
+                    osc2.frequency.setValueAtTime(1200, audioCtx.currentTime);
+                    gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc2.start();
+                    osc2.stop(audioCtx.currentTime + 0.4);
+                }, 150);
+            } catch (err) {
+                console.log('Web Audio context not allowed or not supported yet.', err);
+            }
+        }
+
         // Tab Switching & Map Initialization
         let trackingMap = null;
         let mapMarker = null;
 
         function initOrUpdateMap(lat, lng) {
             if (!trackingMap) {
-                trackingMap = L.map('tracking-map').setView([lat, lng], 15);
+                trackingMap = L.map('tracking-map').setView([lat, lng], 14);
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '© OpenStreetMap contributors',
                     className: 'map-tiles'
@@ -1052,6 +1515,9 @@
                 });
                 
                 mapMarker = L.marker([lat, lng], {icon: customIcon}).addTo(trackingMap);
+                
+                // Draw Geofences immediately upon map creation
+                loadAndDrawGeofences();
             } else {
                 trackingMap.setView([lat, lng]);
                 mapMarker.setLatLng([lat, lng]);
@@ -1090,13 +1556,21 @@
             }
         }
 
-        // Hook into the existing location.js update to animate map
+        // Hook into the existing location.js update to animate map & check geofences
         const originalUpdateLocationUI = window.updateLocationUI;
         if (typeof originalUpdateLocationUI === 'function') {
-            window.updateLocationUI = function(lat, lng, acc) {
-                originalUpdateLocationUI(lat, lng, acc); // Call original
-                if (document.getElementById('tab-tracking').classList.contains('active')) {
-                    initOrUpdateMap(lat, lng);
+            window.updateLocationUI = function() {
+                originalUpdateLocationUI(); // Call original
+                if (typeof currentPosition !== 'undefined' && currentPosition.latitude) {
+                    const lat = currentPosition.latitude;
+                    const lng = currentPosition.longitude;
+                    
+                    if (document.getElementById('tab-tracking').classList.contains('active')) {
+                        initOrUpdateMap(lat, lng);
+                    }
+                    
+                    // Run geofencing logic on every location update
+                    checkGeofences(lat, lng);
                 }
             };
         }
