@@ -7,6 +7,7 @@ let locationWatchId = null;
 let locationIntervalId = null;
 let locationRetryCount = 0;
 const MAX_LOCATION_RETRIES = 3;
+let isLocationPingEnabled = localStorage.getItem('raahi_location_pings') !== 'false';
 
 /**
  * Start tracking the user's location.
@@ -85,6 +86,7 @@ function stopLocationTracking() {
  * Falls back to offline queue if the network is down.
  */
 async function sendLocationToServer() {
+    if (!isLocationPingEnabled) return;
     if (!currentPosition.latitude) return;
 
     const payload = {
@@ -171,7 +173,7 @@ async function loadLocationHistory() {
  * Share the current location via clipboard.
  */
 function shareLocation() {
-    if (!currentPosition.latitude) {
+    if (!currentPosition || !currentPosition.latitude) {
         showToast('Location not available. Please wait for a GPS fix.', 'error');
         return;
     }
@@ -183,14 +185,96 @@ function shareLocation() {
             title: 'My Live Location - Raahi',
             text: 'I am sharing my live location for safety.',
             url: url
-        }).catch(err => console.log('Error sharing:', err));
+        }).catch(err => {
+            console.log('[Location] share failed or cancelled, falling back to clipboard copy:', err);
+            copyToClipboard(url);
+        });
     } else {
-        navigator.clipboard.writeText(url).then(() => {
+        copyToClipboard(url);
+    }
+}
+
+function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
             showToast('Location link copied to clipboard! 📋', 'success');
         }).catch(err => {
-            console.error('Failed to copy:', err);
-            showToast('Failed to share location.', 'error');
+            fallbackCopyToClipboard(text);
         });
+    } else {
+        fallbackCopyToClipboard(text);
     }
+}
+
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showToast('Location link copied to clipboard! 📋', 'success');
+        } else {
+            showToast('Failed to copy location link.', 'error');
+        }
+    } catch (err) {
+        showToast('Failed to copy location link.', 'error');
+    }
+    document.body.removeChild(textArea);
+}
+
+/**
+ * Toggle location pinging to the server ON/OFF.
+ */
+function toggleLocationPings(enabled) {
+    isLocationPingEnabled = enabled;
+    localStorage.setItem('raahi_location_pings', enabled ? 'true' : 'false');
+
+    // Update Live Tracking diagnostic switch and status text
+    const statusText = document.getElementById('ping-status-text');
+    if (statusText) {
+        statusText.textContent = enabled ? 'Enabled' : 'Paused';
+        statusText.style.color = enabled ? '#22c55e' : '#ef4444';
+    }
+
+    const pingToggle = document.getElementById('ping-toggle');
+    if (pingToggle) {
+        pingToggle.checked = enabled;
+    }
+
+    // Update Settings Modal toggle checkbox
+    const settingPings = document.getElementById('setting-location-pings');
+    if (settingPings) {
+        settingPings.checked = enabled;
+    }
+
+    // Update Overview Page card toggle and status
+    const overviewToggle = document.getElementById('overview-ping-toggle');
+    if (overviewToggle) {
+        overviewToggle.checked = enabled;
+    }
+
+    const overviewText = document.getElementById('overview-ping-text');
+    const overviewStatus = document.getElementById('overview-ping-status');
+    const overviewDot = document.getElementById('overview-ping-dot');
+    if (overviewText && overviewStatus && overviewDot) {
+        overviewText.textContent = enabled ? 'Syncing' : 'Paused';
+        overviewStatus.style.color = enabled ? '#10B981' : '#ef4444';
+        overviewDot.style.background = enabled ? '#10B981' : '#ef4444';
+        if (enabled) {
+            overviewDot.style.animation = 'dot-pulse 1.5s infinite';
+            overviewDot.style.boxShadow = '0 0 0 0 rgba(16, 185, 129, 0.7)';
+        } else {
+            overviewDot.style.animation = 'none';
+            overviewDot.style.boxShadow = 'none';
+        }
+    }
+
+    showToast(enabled ? 'Automatic location pings enabled! 🛰️' : 'Automatic location pings paused! 🔐', 'info');
 }
 

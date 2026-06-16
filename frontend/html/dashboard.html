@@ -716,9 +716,18 @@
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-card-header">
-                        <div class="stat-icon-wrapper" style="color: #10B981;">📍</div>
-                        <span style="display:flex; align-items:center; gap: 6px; font-size: 12px; font-weight: 600; color: #10B981;"><span class="pulse-dot" style="margin:0; width:8px; height:8px;"></span> Syncing</span>
+                    <div class="stat-card-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div class="stat-icon-wrapper" style="color: #10B981; margin: 0;">📍</div>
+                            <span id="overview-ping-status" style="display:flex; align-items:center; gap: 6px; font-size: 12px; font-weight: 600; color: #10B981;">
+                                <span class="pulse-dot" id="overview-ping-dot" style="margin:0; width:8px; height:8px;"></span>
+                                <span id="overview-ping-text">Syncing</span>
+                            </span>
+                        </div>
+                        <label class="theme-switch" style="margin: 0; transform: scale(0.85); transform-origin: right center;">
+                            <input type="checkbox" id="overview-ping-toggle" onchange="toggleLocationPings(this.checked)">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                     <div>
                         <div class="value" id="stat-locations">0</div>
@@ -741,10 +750,10 @@
                 <button class="btn btn-outline btn-sm" onclick="shareLocation()" style="display:flex; align-items:center; gap:8px; border-radius:30px; padding: 10px 20px;">
                     <span>📍 Share Location</span>
                 </button>
-                <button class="btn btn-outline btn-sm" onclick="switchTab('tracking')" style="display:flex; align-items:center; gap:8px; border-radius:30px; padding: 10px 20px;">
+                <button class="btn btn-outline btn-sm" onclick="switchMainTab('tracking')" style="display:flex; align-items:center; gap:8px; border-radius:30px; padding: 10px 20px;">
                     <span>🗺️ View Map</span>
                 </button>
-                <button class="btn btn-outline btn-sm" onclick="switchTab('sos')" style="display:flex; align-items:center; gap:8px; border-radius:30px; padding: 10px 20px;">
+                <button class="btn btn-outline btn-sm" onclick="switchMainTab('sos')" style="display:flex; align-items:center; gap:8px; border-radius:30px; padding: 10px 20px;">
                     <span>🚨 SOS Details</span>
                 </button>
             </div>
@@ -860,19 +869,7 @@
                 </div>
             </div>
 
-            <div class="grid-3 reveal" style="transition-delay: 0.3s;">
-                <!-- Nearby Zones Widget -->
-                <div class="premium-card">
-                    <div class="premium-card-header flex-between">
-                        <h2 class="text-title-lg">Nearby Safety Zones</h2>
-                        <span style="font-size: 12px; color: var(--color-muted);">GEO-FENCING</span>
-                    </div>
-                    <div class="premium-card-body" id="nearby-zones-list" style="height: 350px; overflow-y: auto; padding: 0;">
-                        <div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--color-muted);">
-                            <p class="text-body-md">Determining nearby zones...</p>
-                        </div>
-                    </div>
-                </div>
+            <div class="grid-2 reveal" style="transition-delay: 0.3s;">
                 
                 <div class="premium-card">
                     <div class="premium-card-header">
@@ -889,17 +886,28 @@
                     <div class="premium-card-header">
                         <h2 class="text-title-lg">System Diagnostics</h2>
                     </div>
-                    <div class="premium-card-body" style="height: 350px;">
+                    <div class="premium-card-body" style="min-height: 350px; height: auto;">
                         <div class="diagnostic-card mb-md">
                             <div class="text-caption mb-sm">TRACKING ENGINE STATUS</div>
                             <div class="text-title-lg" id="status-text" style="color: #22c55e; display:flex; align-items:center; gap: 12px; font-size: 20px;">
                                 <span class="pulse-dot" style="width: 14px; height: 14px;"></span> Active & Secure
                             </div>
                         </div>
-                        <div class="diagnostic-card">
+                        <div class="diagnostic-card mb-md">
                             <div class="text-caption mb-sm">OFFLINE SYNC QUEUE</div>
                             <div class="text-title-lg" id="queue-count" style="font-size: 32px; font-weight: 800; color: var(--color-ink);">0</div>
                             <p class="text-body-sm mt-xs" style="color: var(--color-muted);">Data points waiting for internet connection.</p>
+                        </div>
+                        <div class="diagnostic-card" style="display: flex; align-items: center; justify-content: space-between; padding: 16px 20px;">
+                            <div>
+                                <div class="text-caption mb-xs">SERVER LOCATION PINGS</div>
+                                <div class="text-title-lg" id="ping-status-text" style="font-weight: 800; font-size: 20px; color: #22c55e;">Enabled</div>
+                                <p class="text-body-sm mt-xs" style="color: var(--color-muted); margin-bottom: 0;">Periodic location pings to server.</p>
+                            </div>
+                            <label class="theme-switch" style="margin: 0; display: inline-block;">
+                                <input type="checkbox" id="ping-toggle" onchange="toggleLocationPings(this.checked)">
+                                <span class="slider round"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -1006,18 +1014,15 @@
                     </div>
                 </div>
 
-                <!-- Real Nearby Locations and Services (Delhi GPS context or Live GPS) -->
+                <!-- Nearby Zones Widget -->
                 <div class="premium-card">
                     <div class="premium-card-header flex-between">
-                        <h2 class="text-title-lg">Nearby Safety Services</h2>
-                        <span style="font-size: 12px; color: var(--color-muted); font-weight: 600; color: #22c55e;">ONLINE</span>
+                        <h2 class="text-title-lg">Nearby Safety Zones</h2>
+                        <span style="font-size: 12px; color: var(--color-muted); font-weight: 600; color: #22c55e;">LIVE PROXIMITY</span>
                     </div>
-                    <div class="premium-card-body" style="padding: 0;">
-                        <div id="nearby-services-list" style="max-height: 400px; overflow-y: auto;">
-                            <!-- Static real landmarks of Delhi categorized and dynamic calculations -->
-                            <div style="padding: 32px; text-align: center; color: var(--color-muted);">
-                                Computing nearest safety stations...
-                            </div>
+                    <div class="premium-card-body" id="nearby-zones-list" style="height: 400px; overflow-y: auto; padding: 0;">
+                        <div style="display:flex; justify-content:center; align-items:center; height:100%; color:var(--color-muted);">
+                            <p class="text-body-md">Determining nearby zones...</p>
                         </div>
                     </div>
                 </div>
@@ -1132,13 +1137,23 @@
                             <span class="slider round"></span>
                         </label>
                     </div>
-                    <div class="mb-xl" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--color-surface-soft); border-radius: 12px; border: 1px solid var(--color-hairline);">
+                    <div class="mb-md" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--color-surface-soft); border-radius: 12px; border: 1px solid var(--color-hairline);">
                         <div>
                             <div style="font-weight: 600; color: var(--color-ink);">Location Sharing</div>
                             <div style="font-size: 13px; color: var(--color-muted); margin-top: 2px;">Share live location during SOS</div>
                         </div>
                         <label class="theme-switch">
                             <input type="checkbox" id="setting-location-share" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div class="mb-xl" style="display: flex; align-items: center; justify-content: space-between; padding: 16px; background: var(--color-surface-soft); border-radius: 12px; border: 1px solid var(--color-hairline);">
+                        <div>
+                            <div style="font-weight: 600; color: var(--color-ink);">Automatic Location Pings</div>
+                            <div style="font-size: 13px; color: var(--color-muted); margin-top: 2px;">Periodically send GPS to server (every 10s)</div>
+                        </div>
+                        <label class="theme-switch">
+                            <input type="checkbox" id="setting-location-pings" checked onchange="toggleLocationPings(this.checked)">
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -1205,6 +1220,9 @@
                     document.getElementById('setting-sms-alerts').checked = user.preferences.sms !== false;
                     document.getElementById('setting-location-share').checked = user.preferences.location !== false;
                 }
+                const pingsEnabled = localStorage.getItem('raahi_location_pings') !== 'false';
+                const settingPings = document.getElementById('setting-location-pings');
+                if (settingPings) settingPings.checked = pingsEnabled;
             }
 
             document.getElementById('settings-modal-overlay').classList.add('show');
@@ -1237,7 +1255,6 @@
                     document.getElementById('overview-name').textContent = user.name.split(' ')[0];
                 }
                 closeSettingsModal();
-                showToast('Profile updated successfully! ✅', 'success');
             } catch (err) {
                 console.error('[Settings] Profile update failed:', err);
                 showToast('Failed to update profile: ' + err.message, 'error');
@@ -1261,7 +1278,6 @@
                     body: JSON.stringify({ currentPassword, newPassword })
                 });
                 closeSettingsModal();
-                showToast('Password updated successfully! 🔒', 'success');
             } catch (err) {
                 console.error('[Settings] Password update failed:', err);
                 showToast(err.message || 'Failed to update password. ❌', 'error');
@@ -1280,18 +1296,27 @@
                 localStorage.setItem('raahi_user', JSON.stringify(user));
             }
             closeSettingsModal();
-            showToast('Preferences saved! 🔔', 'success');
         }
 
         // Theme Toggle
         function toggleTheme() {
             const isDark = document.body.classList.toggle('dark-theme');
+            localStorage.setItem('raahi_theme', isDark ? 'dark' : 'light');
             document.getElementById('theme-icon-moon').style.display = isDark ? 'none' : 'block';
             document.getElementById('theme-icon-sun').style.display = isDark ? 'block' : 'none';
         }
 
         // Initialize User Data
         document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('raahi_theme');
+            const isDark = savedTheme === 'dark';
+            const moonIcon = document.getElementById('theme-icon-moon');
+            const sunIcon = document.getElementById('theme-icon-sun');
+            if (moonIcon && sunIcon) {
+                moonIcon.style.display = isDark ? 'none' : 'block';
+                sunIcon.style.display = isDark ? 'block' : 'none';
+            }
+
             const user = getCurrentUser();
             if (user) {
                 const dropEmail = document.getElementById('dropdown-email');
@@ -1327,11 +1352,14 @@
         let loadedGeofences = [];
         let geofenceCircles = [];
         let previousSafetyZone = null;
+        let alertedApproaches = {};
+        let isFirstGeofenceCheck = true;
+        const APPROACH_THRESHOLD_METERS = 100;
 
         function loadAndDrawGeofences() {
             if (!trackingMap) return;
 
-            // Clear old circles
+            // Clear old circles & markers
             geofenceCircles.forEach(c => trackingMap.removeLayer(c));
             geofenceCircles = [];
 
@@ -1340,9 +1368,19 @@
                     loadedGeofences = zones;
                     zones.forEach(zone => {
                         let color = '#22c55e'; // Green
-                        if (zone.zoneType === 'RED') color = '#ef4444'; // Red
-                        else if (zone.zoneType === 'YELLOW') color = '#f59e0b'; // Yellow
+                        let markerEmoji = '🟢';
+                        let zoneLabel = 'Safe Area';
+                        if (zone.zoneType === 'RED') {
+                            color = '#ef4444'; // Red
+                            markerEmoji = '🔴';
+                            zoneLabel = 'Danger / Restricted Zone';
+                        } else if (zone.zoneType === 'YELLOW') {
+                            color = '#f59e0b'; // Yellow
+                            markerEmoji = '🟡';
+                            zoneLabel = 'Caution Zone';
+                        }
 
+                        // 1. Draw boundary circle
                         const circle = L.circle([zone.latitude, zone.longitude], {
                             color: color,
                             fillColor: color,
@@ -1353,6 +1391,40 @@
 
                         circle.bindPopup(`<strong>${zone.name}</strong><br>${zone.description}`);
                         geofenceCircles.push(circle);
+
+                        // 2. Draw nice center marker icon
+                        const centerIconHtml = `<div style="
+                            background: white; 
+                            width: 24px; 
+                            height: 24px; 
+                            border-radius: 50%; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            font-size: 13px; 
+                            border: 2px solid ${color}; 
+                            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+                        ">${markerEmoji}</div>`;
+
+                        const centerIcon = L.divIcon({
+                            className: 'geofence-center-marker',
+                            html: centerIconHtml,
+                            iconSize: [24, 24],
+                            iconAnchor: [12, 12]
+                        });
+
+                        const centerMarker = L.marker([zone.latitude, zone.longitude], { icon: centerIcon })
+                            .bindPopup(`
+                                <div style="font-family: sans-serif; padding: 4px;">
+                                    <strong style="color: ${color}; font-size: 13px;">${markerEmoji} ${zoneLabel}</strong>
+                                    <h4 style="margin: 4px 0 2px 0; font-size: 14px; font-weight: 700; color: var(--color-ink);">${zone.name}</h4>
+                                    <p style="margin: 0 0 6px 0; font-size: 12px; color: var(--color-body);">${zone.description || 'No safety instructions'}</p>
+                                    <p style="margin: 0; font-size: 11px; color: var(--color-muted);">Radius: ${zone.radius}m</p>
+                                </div>
+                            `);
+                        
+                        centerMarker.addTo(trackingMap);
+                        geofenceCircles.push(centerMarker);
                     });
 
                     // Trigger initial proximity check
@@ -1385,6 +1457,7 @@
             loadedGeofences.forEach(zone => {
                 const dist = calculateDistance(lat, lng, zone.latitude, zone.longitude);
                 const inside = dist <= zone.radius;
+                const approaching = dist <= (zone.radius + APPROACH_THRESHOLD_METERS);
 
                 nearbyList.push({
                     name: zone.name,
@@ -1402,6 +1475,52 @@
                         activeZone = zone;
                     }
                 }
+
+                // Handle Approach & Entry Notifications for each zone individually
+                const previousState = alertedApproaches[zone.id];
+                if (inside) {
+                    if (previousState !== 'inside') {
+                        // Just entered the zone
+                        alertedApproaches[zone.id] = 'inside';
+                        if (!isFirstGeofenceCheck) {
+                            if (zone.zoneType === 'RED') {
+                                showToast(`🚨 DANGER: Entered RED Danger Zone: ${zone.name}! ${zone.description || ''}`, 'error');
+                                triggerAlertSound();
+                            } else if (zone.zoneType === 'YELLOW') {
+                                showToast(`⚠️ WARNING: Entered YELLOW Zone: ${zone.name}. ${zone.description || ''}`, 'warning');
+                                triggerAlertSound();
+                            } else {
+                                showToast(`💚 Safe Area: Entered ${zone.name}.`, 'success');
+                            }
+                        }
+                    }
+                } else if (approaching) {
+                    if (previousState === 'inside') {
+                        // User was inside and is now exiting but still close (approaching)
+                        alertedApproaches[zone.id] = 'approaching';
+                        if (!isFirstGeofenceCheck) {
+                            showToast(`💚 Exited Zone: ${zone.name}.`, 'info');
+                        }
+                    } else if (previousState !== 'approaching') {
+                        // User is approaching the zone from the outside
+                        alertedApproaches[zone.id] = 'approaching';
+                        if (!isFirstGeofenceCheck) {
+                            const distToBoundary = Math.round(dist - zone.radius);
+                            if (zone.zoneType === 'RED') {
+                                showToast(`🚨 Danger Alert: Approaching RED Zone: ${zone.name} (within ${distToBoundary}m)! Do not enter.`, 'error');
+                                triggerAlertSound();
+                            } else if (zone.zoneType === 'YELLOW') {
+                                showToast(`⚠️ Warning: Approaching YELLOW Zone: ${zone.name} (within ${distToBoundary}m). Stay careful.`, 'warning');
+                                triggerWarningSound();
+                            }
+                        }
+                    }
+                } else {
+                    // Completely outside of the zone and its approach threshold
+                    if (previousState) {
+                        delete alertedApproaches[zone.id];
+                    }
+                }
             });
 
             // Update safety status badge
@@ -1410,13 +1529,6 @@
                 if (activeZone) {
                     badge.innerHTML = activeZone.zoneType === 'RED' ? '🚨 Danger / Restricted' : '⚠️ Care Needed';
                     badge.className = 'badge ' + (activeZone.zoneType === 'RED' ? 'badge-active' : 'badge-warning');
-                    
-                    // Alert on transition into new hazard zone
-                    if (previousSafetyZone !== activeZone.name) {
-                        previousSafetyZone = activeZone.name;
-                        showToast(`⚠️ Warning: Entered safety hazard zone: ${activeZone.name}!`, 'error');
-                        triggerAlertSound();
-                    }
                 } else {
                     badge.innerHTML = '💚 Safe Zone';
                     badge.className = 'badge badge-resolved';
@@ -1458,6 +1570,7 @@
                     `;
                 }).join('');
             }
+            isFirstGeofenceCheck = false;
         }
 
         function triggerAlertSound() {
@@ -1494,9 +1607,190 @@
             }
         }
 
+        function triggerWarningSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                // Softer sine wave warning beep
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // pleasant warning tone
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } catch (err) {
+                console.log('Web Audio context not allowed or not supported yet.', err);
+            }
+        }
+
         // Tab Switching & Map Initialization
         let trackingMap = null;
         let mapMarker = null;
+
+        let serviceMarkersGroup = null;
+
+        async function loadAndDrawSafetyServices(lat, lng) {
+            if (!trackingMap) return;
+
+            // Initialize the group if not already created
+            if (!serviceMarkersGroup) {
+                serviceMarkersGroup = L.layerGroup().addTo(trackingMap);
+            } else {
+                serviceMarkersGroup.clearLayers();
+            }
+
+            try {
+                // Fetch from Overpass API (all nodes, ways, relations matching safety facilities & government offices within 5000m)
+                const query = `[out:json][timeout:25];(nwr["amenity"~"hospital|police|fire_station|townhall|courthouse"](around:5000,${lat},${lng});nwr["office"="government"](around:5000,${lat},${lng}););out center;`;
+                const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
+                if (!response.ok) throw new Error('Failed to fetch services');
+                
+                const data = await response.json();
+                if (data && data.elements && data.elements.length > 0) {
+                    data.elements.forEach(element => {
+                        const itemLat = element.lat || (element.center && element.center.lat);
+                        const itemLon = element.lon || (element.center && element.center.lon);
+                        
+                        if (!itemLat || !itemLon) return;
+
+                        const name = element.tags.name || element.tags.operator || 'Emergency Service';
+                        const amenity = element.tags.amenity;
+                        const office = element.tags.office;
+                        
+                        let emoji = '🚨';
+                        let label = 'Emergency Service';
+                        let markerColor = '#6b7280'; // gray
+                        
+                        if (amenity === 'hospital') {
+                            emoji = '🏥';
+                            label = 'Hospital / Medical';
+                            markerColor = '#ef4444'; // red
+                        } else if (amenity === 'police') {
+                            emoji = '👮';
+                            label = 'Police Station';
+                            markerColor = '#3b82f6'; // blue
+                        } else if (amenity === 'fire_station') {
+                            emoji = '🚒';
+                            label = 'Fire Station';
+                            markerColor = '#f97316'; // orange
+                        } else if (amenity === 'townhall' || amenity === 'courthouse' || office === 'government') {
+                            emoji = '🏛️';
+                            label = 'Government Office / Public Service';
+                            markerColor = '#8b5cf6'; // purple
+                        }
+
+                        // Create custom divIcon for elegant rendering
+                        const iconHtml = `<div style="
+                            background: white; 
+                            width: 28px; 
+                            height: 28px; 
+                            border-radius: 50%; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            font-size: 16px; 
+                            border: 2px solid ${markerColor}; 
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        ">${emoji}</div>`;
+
+                        const customIcon = L.divIcon({
+                            className: 'custom-service-marker',
+                            html: iconHtml,
+                            iconSize: [28, 28],
+                            iconAnchor: [14, 14]
+                        });
+
+                        const marker = L.marker([itemLat, itemLon], { icon: customIcon })
+                            .bindPopup(`
+                                <div style="font-family: sans-serif; padding: 4px;">
+                                    <strong style="color: ${markerColor}; font-size: 13px;">${emoji} ${label}</strong>
+                                    <h4 style="margin: 6px 0 2px 0; font-size: 14px; font-weight: 700; color: var(--color-ink);">${name}</h4>
+                                    <p style="margin: 0; font-size: 11px; color: var(--color-muted);">Latitude: ${itemLat.toFixed(5)}<br>Longitude: ${itemLon.toFixed(5)}</p>
+                                </div>
+                            `);
+                        
+                        serviceMarkersGroup.addLayer(marker);
+                    });
+                } else {
+                    drawStaticFallbackServices(lat, lng);
+                }
+            } catch (err) {
+                console.warn('[Safety Services] Failed to load from Overpass API, using static fallback:', err);
+                drawStaticFallbackServices(lat, lng);
+            }
+        }
+
+        function drawStaticFallbackServices(lat, lng) {
+            if (!trackingMap || !serviceMarkersGroup) return;
+            serviceMarkersGroup.clearLayers();
+
+            // Mock 4 emergency locations relative to current user coords matching the categories
+            const mocks = [
+                { name: 'City Central Hospital', lat: lat + 0.005, lon: lng - 0.003, amenity: 'hospital' },
+                { name: 'District Police Headquarters', lat: lat - 0.004, lon: lng + 0.006, amenity: 'police' },
+                { name: 'Emergency Fire & Rescue Station', lat: lat + 0.008, lon: lng + 0.002, amenity: 'fire_station' },
+                { name: 'Municipal Town Hall & Offices', lat: lat - 0.003, lon: lng - 0.007, amenity: 'townhall' }
+            ];
+
+            mocks.forEach(m => {
+                let emoji = '🚨';
+                let label = 'Emergency Service';
+                let markerColor = '#6b7280';
+                
+                if (m.amenity === 'hospital') {
+                    emoji = '🏥';
+                    label = 'Hospital / Medical';
+                    markerColor = '#ef4444';
+                } else if (m.amenity === 'police') {
+                    emoji = '👮';
+                    label = 'Police Station';
+                    markerColor = '#3b82f6';
+                } else if (m.amenity === 'fire_station') {
+                    emoji = '🚒';
+                    label = 'Fire Station';
+                    markerColor = '#f97316';
+                } else if (m.amenity === 'townhall') {
+                    emoji = '🏛️';
+                    label = 'Government Office / Public Service';
+                    markerColor = '#8b5cf6';
+                }
+
+                const iconHtml = `<div style="
+                    background: white; 
+                    width: 28px; 
+                    height: 28px; 
+                    border-radius: 50%; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    font-size: 16px; 
+                    border: 2px solid ${markerColor}; 
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                ">${emoji}</div>`;
+
+                const customIcon = L.divIcon({
+                    className: 'custom-service-marker',
+                    html: iconHtml,
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14]
+                });
+
+                const marker = L.marker([m.lat, m.lon], { icon: customIcon })
+                    .bindPopup(`
+                        <div style="font-family: sans-serif; padding: 4px;">
+                            <strong style="color: ${markerColor}; font-size: 13px;">${emoji} ${label} (Demo)</strong>
+                            <h4 style="margin: 6px 0 2px 0; font-size: 14px; font-weight: 700; color: var(--color-ink);">${m.name}</h4>
+                            <p style="margin: 0; font-size: 11px; color: var(--color-muted);">Latitude: ${m.lat.toFixed(5)}<br>Longitude: ${m.lon.toFixed(5)}</p>
+                        </div>
+                    `);
+                
+                serviceMarkersGroup.addLayer(marker);
+            });
+        }
 
         function initOrUpdateMap(lat, lng) {
             if (!trackingMap) {
@@ -1518,6 +1812,8 @@
                 
                 // Draw Geofences immediately upon map creation
                 loadAndDrawGeofences();
+                // Draw safety services immediately
+                loadAndDrawSafetyServices(lat, lng);
             } else {
                 trackingMap.setView([lat, lng]);
                 mapMarker.setLatLng([lat, lng]);
@@ -1525,21 +1821,33 @@
         }
 
         function switchMainTab(tabId, btn) {
+            // Find corresponding tab button in the navbar if not passed
+            if (!btn) {
+                btn = Array.from(document.querySelectorAll('.product-tab')).find(button => {
+                    const clickAttr = button.getAttribute('onclick');
+                    return clickAttr && clickAttr.includes(`'${tabId}'`);
+                });
+            }
+
             document.querySelectorAll('.product-tab').forEach(t => t.classList.remove('active'));
-            btn.classList.add('active');
+            if (btn) {
+                btn.classList.add('active');
+            }
             
             document.querySelectorAll('.section-container').forEach(s => {
                 s.classList.remove('active');
             });
             
             const targetSection = document.getElementById('tab-' + tabId);
-            targetSection.classList.add('active');
-            
-            // Re-trigger animations for the new tab
-            targetSection.querySelectorAll('.reveal').forEach(el => {
-                el.classList.remove('active');
-                setTimeout(() => el.classList.add('active'), 50);
-            });
+            if (targetSection) {
+                targetSection.classList.add('active');
+                
+                // Re-trigger animations for the new tab
+                targetSection.querySelectorAll('.reveal').forEach(el => {
+                    el.classList.remove('active');
+                    setTimeout(() => el.classList.add('active'), 50);
+                });
+            }
 
             // Initialize Map if tracking tab is opened
             if (tabId === 'tracking') {
@@ -1567,6 +1875,7 @@
                     
                     if (document.getElementById('tab-tracking').classList.contains('active')) {
                         initOrUpdateMap(lat, lng);
+                        loadAndDrawSafetyServices(lat, lng);
                     }
                     
                     // Run geofencing logic on every location update
@@ -1575,7 +1884,180 @@
             };
         }
 
+        // Autofill live GPS coordinates into custom geofence form
+        function setCurrentCoords() {
+            if (typeof currentPosition !== 'undefined' && currentPosition.latitude) {
+                document.getElementById('gf-lat').value = currentPosition.latitude.toFixed(6);
+                document.getElementById('gf-lng').value = currentPosition.longitude.toFixed(6);
+                showToast('Live GPS coordinates autofilled! 📍', 'success');
+            } else {
+                showToast('Waiting for GPS coordinates... Please ensure location tracking is active.', 'warning');
+            }
+        }
+
+        // Submit custom geofence to backend
+        async function createCustomGeofence(event) {
+            event.preventDefault();
+            const name = document.getElementById('gf-name').value.trim();
+            const zoneType = document.getElementById('gf-type').value;
+            const latitude = parseFloat(document.getElementById('gf-lat').value);
+            const longitude = parseFloat(document.getElementById('gf-lng').value);
+            const radius = parseFloat(document.getElementById('gf-radius').value);
+            const description = document.getElementById('gf-desc').value.trim();
+
+            try {
+                await apiFetch('/geofences', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        name,
+                        zoneType,
+                        latitude,
+                        longitude,
+                        radius,
+                        description
+                    })
+                });
+                document.getElementById('custom-geofence-form').reset();
+                
+                // Reload lists & update map if available
+                loadGeofencesList();
+                if (trackingMap) {
+                    loadAndDrawGeofences();
+                }
+            } catch (err) {
+                console.error('[Geofencing] Failed to create custom geofence:', err);
+                showToast('Failed to create safety perimeter: ' + err.message, 'error');
+            }
+        }
+
+        // Load and render registered geofences list
+        async function loadGeofencesList() {
+            const container = document.getElementById('full-geofence-table-container');
+            if (!container) return;
+
+            try {
+                const data = await apiFetch('/geofences');
+                loadedGeofences = data; // Keep sync'd
+
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div style="padding: 40px; text-align: center; color: var(--color-muted);"><p>No custom perimeters registered yet.</p></div>';
+                    const countEl = document.getElementById('active-perimeters-count');
+                    if (countEl) countEl.textContent = '0';
+                    return;
+                }
+
+                const countEl = document.getElementById('active-perimeters-count');
+                if (countEl) countEl.textContent = data.length;
+
+                container.innerHTML = `
+                    <div style="overflow-x: auto;">
+                        <table class="premium-table" style="width: 100%; border-collapse: collapse; text-align: left; min-width: 500px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--color-hairline); color: var(--color-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;">
+                                    <th style="padding: 16px 12px;">Name & Details</th>
+                                    <th style="padding: 16px 12px;">Category</th>
+                                    <th style="padding: 16px 12px;">Coordinates</th>
+                                    <th style="padding: 16px 12px;">Radius</th>
+                                    <th style="padding: 16px 12px; text-align: right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.map(zone => {
+                                    let badgeClass = 'badge-resolved';
+                                    let typeText = 'Safe (Green)';
+                                    if (zone.zoneType === 'RED') {
+                                        badgeClass = 'badge-active';
+                                        typeText = 'Danger (Red)';
+                                    } else if (zone.zoneType === 'YELLOW') {
+                                        badgeClass = 'badge-warning';
+                                        typeText = 'Warning (Yellow)';
+                                    }
+
+                                    return `
+                                        <tr style="border-bottom: 1px solid var(--color-hairline-soft); font-size: 13px; transition: background 0.2s;">
+                                            <td style="padding: 14px 12px; max-width: 180px;">
+                                                <div style="font-weight: 700; color: var(--color-ink);">${zone.name}</div>
+                                                <div style="font-size: 11px; color: var(--color-muted); margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${zone.description || 'No instruction details'}</div>
+                                            </td>
+                                            <td style="padding: 14px 12px;">
+                                                <span class="badge ${badgeClass}" style="font-size: 11px; padding: 4px 10px;">${typeText}</span>
+                                            </td>
+                                            <td style="padding: 14px 12px; font-family: monospace; font-size: 11px; color: var(--color-muted);">
+                                                ${zone.latitude.toFixed(5)}, ${zone.longitude.toFixed(5)}
+                                            </td>
+                                            <td style="padding: 14px 12px; color: var(--color-ink); font-weight: 600;">
+                                                ${zone.radius}m
+                                            </td>
+                                            <td style="padding: 14px 12px; text-align: right;">
+                                                <button class="btn-icon-danger" onclick="deleteGeofence(${zone.id})" style="background: none; border: none; cursor: pointer; font-size: 15px; padding: 6px; border-radius: 6px;" title="Remove Perimeter">🗑️</button>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('[Geofencing] Failed to load geofences list:', err);
+                container.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--color-primary);">Error loading perimeters.</div>';
+            }
+        }
+
+        // Delete geofence by ID
+        async function deleteGeofence(id) {
+            if (!confirm('Are you sure you want to delete this safety zone perimeter?')) return;
+
+            try {
+                await apiFetch(`/geofences/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                // Reload list & update map if available
+                loadGeofencesList();
+                if (trackingMap) {
+                    loadAndDrawGeofences();
+                }
+            } catch (err) {
+                console.error('[Geofencing] Delete failed:', err);
+                showToast('Failed to delete perimeter: ' + err.message, 'error');
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Load custom geofences list and update state
+            loadGeofencesList();
+
+            // Initialize Location Pings Toggle and Status Text
+            const pingsEnabled = localStorage.getItem('raahi_location_pings') !== 'false';
+            const pingToggle = document.getElementById('ping-toggle');
+            const pingStatusText = document.getElementById('ping-status-text');
+            if (pingToggle) pingToggle.checked = pingsEnabled;
+            if (pingStatusText) {
+                pingStatusText.textContent = pingsEnabled ? 'Enabled' : 'Paused';
+                pingStatusText.style.color = pingsEnabled ? '#22c55e' : '#ef4444';
+            }
+
+            // Sync Overview Page elements
+            const overviewToggle = document.getElementById('overview-ping-toggle');
+            if (overviewToggle) overviewToggle.checked = pingsEnabled;
+            
+            const overviewText = document.getElementById('overview-ping-text');
+            const overviewStatus = document.getElementById('overview-ping-status');
+            const overviewDot = document.getElementById('overview-ping-dot');
+            if (overviewText && overviewStatus && overviewDot) {
+                overviewText.textContent = pingsEnabled ? 'Syncing' : 'Paused';
+                overviewStatus.style.color = pingsEnabled ? '#10B981' : '#ef4444';
+                overviewDot.style.background = pingsEnabled ? '#10B981' : '#ef4444';
+                if (pingsEnabled) {
+                    overviewDot.style.animation = 'dot-pulse 1.5s infinite';
+                    overviewDot.style.boxShadow = '0 0 0 0 rgba(16, 185, 129, 0.7)';
+                } else {
+                    overviewDot.style.animation = 'none';
+                    overviewDot.style.boxShadow = 'none';
+                }
+            }
+
             const hash = window.location.hash.replace('#', '');
             if (hash === 'tracking' || hash === 'sos') {
                 const btn = document.querySelector(`button[onclick*="'${hash}'"]`);

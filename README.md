@@ -1,113 +1,133 @@
-# Raahi – Smart Tourist Safety Monitoring System
+# 🗺️ Raahi – Smart Tourist Safety & Incident Monitoring System
 
-A complete real-time safety platform for tourists featuring SOS alerts, live location tracking, emergency contacts, and incident reporting.
+<p align="center">
+  <img src="https://img.shields.io/badge/Java-17-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
+  <img src="https://img.shields.io/badge/Spring_Boot-3.2.5-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" />
+  <img src="https://img.shields.io/badge/JavaScript-ES6-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+  <img src="https://img.shields.io/badge/Leaflet-Maps-199900?style=for-the-badge&logo=leaflet&logoColor=white" alt="Leaflet" />
+  <img src="https://img.shields.io/badge/JWT-Secure-000000?style=for-the-badge&logo=json-web-tokens&logoColor=white" alt="JWT" />
+</p>
 
-## Tech Stack
+---
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | HTML, CSS, Vanilla JavaScript |
-| Backend | Spring Boot 3.2.5 (Java 17) |
-| Database | MySQL 8+ |
-| Build | Gradle 8.7 (Groovy DSL) |
-| Auth | JWT (jjwt 0.12) |
+## 🌟 Overview
 
-## Project Structure
+**Raahi** (meaning *Traveler* in Hindi) is a premium, real-time safety and distress monitoring platform designed specifically for tourists. It provides instant SOS signaling, live tracking with diagnostics controls, safety geofences, community incident reports, and automated alert dispatching to emergency contacts.
+
+Built with a **modern glassmorphism UI** that supports responsive dark and light modes, Raahi integrates directly with OpenStreetMap via **Leaflet JS** to render high-contrast dark maps, safety boundaries, and nearby safety services dynamically.
+
+---
+
+## 🚀 Key Features
+
+### 🚨 SOS Distress System
+* **One-Tap Signal**: Instantly trigger an active SOS alert with your live coordinates.
+* **📦 Progress Tracker**: Track the emergency resolution pipeline (Triggered ➡️ Dispatch Notified ➡️ Responders Dispatched ➡️ Arrived on Scene ➡️ Resolved) on a detailed Flipkart/Amazon style stepper panel.
+* **Auto Email Dispatch**: Automatically emails details (coordinates, message, and a live tracking link) to all registered trusted emergency contacts on alert creation.
+
+### 🛰️ Live Location & Diagnostics
+* **watchPosition Tracking**: High-accuracy interval-based GPS tracking.
+* **Pings Control**: Persistent toggle switch to start/pause automatic server location synchronization pings.
+* **Offline Resilience**: Automatically queues failed location updates locally and syncs them once connection returns.
+
+### 🛡️ Geofencing & Safety Zones
+* **Custom Safety Boundaries**: Define geofences with custom radii.
+* **Proximity Triggers**: Receives alerts on entry/approach of geofences. Page loads handle initial states silently to prevent unnecessary alarm spam.
+
+### 🏛️ Interactive Safety Map
+* **OSM Integration**: Dynamically load real safety assets (hospitals, police stations, fire stations, and government offices) around the tourist.
+* **Polygon Center Resolution**: Upgraded Overpass queries to parse area ways and relations (`nwr` + `out center;`) for pinpoint marker precision.
+* **Polished Dark Mode**: Features custom canvas theme gradients, inline popup styles utilizing theme variable tokens, and dark map filters.
+
+---
+
+## 📂 Project Structure
 
 ```
 raahi/
 ├── schema.sql                    # MySQL database schema
 ├── backend/
 │   ├── build.gradle              # Gradle build file
-│   ├── settings.gradle
-│   ├── gradle/wrapper/           # Gradle wrapper
 │   └── src/main/
 │       ├── java/com/raahi/
-│       │   ├── RaahiApplication.java
-│       │   ├── config/           # Security, JWT, CORS, Exception handling
-│       │   ├── entity/           # JPA entities (5 tables)
-│       │   ├── repository/       # Spring Data JPA repositories
-│       │   ├── service/          # Business logic layer
-│       │   ├── controller/       # REST API controllers
-│       │   └── dto/              # Data transfer objects
+│       │   ├── config/           # JWT, security filters, CORS configuration
+│       │   ├── entity/           # JPA entities (User, Alert, Incident, Geofence, EmergencyContact)
+│       │   ├── repository/       # JpaRepository interfaces
+│       │   ├── service/          # Business logic (SOS, Email alerts, GIS processing)
+│       │   └── controller/       # RestController endpoints
 │       └── resources/
 │           └── application.properties
 └── frontend/
-    ├── index.html                # Login / Register page
-    ├── dashboard.html            # Main dashboard
-    ├── css/style.css             # Design system
+    ├── index.html                # Login / Register entry point
+    ├── dashboard.html            # Main dashboard view
+    ├── html/
+    │   └── alert-tracking.html   # Dedicated SOS status & map tracking page
+    ├── css/style.css             # Glassmorphism design system & styling
     └── js/
-        ├── config.js             # API config & utilities
-        ├── auth.js               # Authentication logic
-        ├── dashboard.js          # Dashboard controller
-        ├── location.js           # GPS tracking
-        ├── sos.js                # SOS alert system
-        └── offline.js            # Offline queue & sync
+        ├── config.js             # API settings, global theme loader & notifications
+        ├── location.js           # GPS watchPosition & pings management
+        ├── sos.js                # SOS dispatch & timeline tracking triggers
+        └── offline.js            # LocalStorage queue & network auto-sync
 ```
 
-## Quick Start
+---
+
+## ⚡ Quick Start
 
 ### 1. Database Setup
 
+Create the MySQL schema and user:
 ```sql
 CREATE DATABASE raahi_db;
 CREATE USER 'raahi'@'localhost' IDENTIFIED BY 'raahi_pass';
 GRANT ALL PRIVILEGES ON raahi_db.* TO 'raahi'@'localhost';
 FLUSH PRIVILEGES;
 ```
+Spring Boot automatically handles schema tables creation via Hibernate JPA.
 
-Then optionally run `schema.sql` – Spring Boot will auto-create tables via JPA.
+### 2. Run the Backend
 
-### 2. Backend
-
+Run the Spring Boot application using Gradle:
 ```bash
 cd backend
-
-# On Windows:
-gradlew.bat bootRun
-
-# On Mac/Linux:
+# Windows
+.\gradlew.bat bootRun
+# Linux/macOS
 ./gradlew bootRun
 ```
+The REST API server runs on **http://localhost:8080**.
 
-The server starts on **http://localhost:8080**.
+### 3. Launch the Frontend
 
-### 3. Frontend
-
-Open `frontend/index.html` in your browser, or use a live server:
-
+For optimal reload and routing, serve `frontend` on port **5500**:
 ```bash
 cd frontend
 npx live-server --port=5500
 ```
+Open **http://127.0.0.1:5500** in your browser.
 
-## API Endpoints
+---
 
-| Method | Endpoint | Description | Auth |
-|--------|----------|-------------|------|
-| POST | `/api/auth/register` | Register new user | No |
-| POST | `/api/auth/login` | Login | No |
-| POST | `/api/locations` | Update location | Yes |
-| POST | `/api/locations/batch` | Batch sync locations | Yes |
-| GET | `/api/locations` | Get location history | Yes |
-| POST | `/api/alerts/sos` | Send SOS | Yes |
-| GET | `/api/alerts/my` | My alerts | Yes |
-| GET | `/api/alerts/nearby` | Nearby active alerts | Yes |
-| PUT | `/api/alerts/{id}/resolve` | Resolve alert | Yes |
-| POST | `/api/contacts` | Add emergency contact | Yes |
-| GET | `/api/contacts` | List contacts | Yes |
-| DELETE | `/api/contacts/{id}` | Remove contact | Yes |
-| POST | `/api/incidents` | Report incident | Yes |
-| GET | `/api/incidents/my` | My incidents | Yes |
-| GET | `/api/incidents/nearby` | Nearby incidents | Yes |
+## 🔑 REST API Reference
 
-## Features
+All requests must contain a `Bearer <JWT_TOKEN>` Authorization header except auth endpoints.
 
-- **JWT Authentication** – Secure register/login flow with BCrypt passwords
-- **SOS Alert System** – One-tap distress signal with GPS coordinates
-- **Live Location Tracking** – Interval-based (10s) GPS updates with watchPosition
-- **Emergency Contacts** – CRUD for trusted contacts
-- **Incident Reporting** – Community safety reports with categories
-- **Nearby Alerts** – Haversine-based proximity query
-- **Offline Support** – LocalStorage queue with auto-sync on reconnect
-- **Responsive UI** – Mobile-first dark theme with glassmorphism design
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| **POST** | `/api/auth/register` | Register a new traveler |
+| **POST** | `/api/auth/login` | Retrieve JWT credentials |
+| **POST** | `/api/alerts/sos` | Trigger a new active SOS |
+| **PUT** | `/api/alerts/{id}/resolve` | Mark distress alert resolved |
+| **GET** | `/api/alerts/my` | Retrieve my historical alerts |
+| **GET** | `/api/alerts/nearby` | Query active alerts within proximity |
+| **POST** | `/api/locations` | Update current GPS location |
+| **POST** | `/api/locations/batch` | Synchronize offline location logs |
+| **POST** | `/api/contacts` | Add a new emergency contact |
+| **GET** | `/api/contacts` | Fetch registered contacts |
+| **POST** | `/api/incidents` | Report a community safety issue |
+
+---
+
+> [!TIP]
+> Make sure to configure your SMTP settings in `application.properties` to fully test the emergency contact notification emails!

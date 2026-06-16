@@ -409,3 +409,381 @@ a {
     .text-display-lg { font-size: 28px; }
     .nav-links { display: none; }
 }
+
+/* ============================================================
+   ICON BUTTON UTILITY
+   ============================================================ */
+.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: none;
+    color: var(--color-ink);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.icon-btn:hover {
+    background: var(--color-surface-soft);
+}
+
+/* ============================================================
+   DARK THEME SYSTEM
+   ============================================================ */
+body.dark-theme {
+    --color-ink: #FFFFFF;
+    --color-body: #E0E0E0;
+    --color-muted: #A0A0A0;
+    --color-muted-soft: #555555;
+    
+    --color-canvas: #0F172A; /* Deeper premium dark blue canvas */
+    --color-surface-soft: #1E293B; /* slate-800 */
+    --color-surface-strong: #334155; /* slate-700 */
+    
+    --color-hairline: rgba(255, 255, 255, 0.08);
+    --color-hairline-soft: rgba(255, 255, 255, 0.04);
+
+    background-color: #0F172A;
+    background-image: 
+        radial-gradient(circle at 15% 50%, rgba(229, 46, 77, 0.04), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(56, 189, 248, 0.03), transparent 25%);
+    color: var(--color-body);
+}
+
+body.dark-theme .navbar {
+    background: rgba(15, 23, 42, 0.85) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .card {
+    background: rgba(30, 41, 59, 0.6) !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme .btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+body.dark-theme .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .input-field {
+    background: rgba(15, 23, 42, 0.5);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+body.dark-theme .input-field:focus {
+    background: #1E293B;
+    border-color: var(--color-primary);
+}
+
+/* ============================================================
+   THEMED SECTIONS & AUTH PAGES
+   ============================================================ */
+#features {
+    background-color: var(--color-surface-soft);
+    transition: background-color 0.3s;
+}
+
+body.auth-page {
+    background-color: var(--color-surface-soft);
+    transition: background-color 0.3s;
+}
+
+body.dark-theme.auth-page {
+    background-color: #0F172A;
+}
+
+/* Override inline background color styles in subpages for dark mode */
+body.dark-theme div[style*="background: #F8FAFC"],
+body.dark-theme div[style*="background:#F8FAFC"] {
+    background: rgba(30, 41, 59, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+body.dark-theme div[style*="background: #FFF1F2"],
+body.dark-theme div[style*="background:#FFF1F2"] {
+    background: rgba(229, 46, 77, 0.15) !important;
+    border: 1px solid rgba(229, 46, 77, 0.3) !important;
+    color: #FF8F9F !important;
+}
+
+/* ============================================================
+   PREMIUM TOAST NOTIFICATIONS
+   ============================================================ */
+#toast-container {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 16px;
+    box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.05),
+        inset 0 2px 4px rgba(255, 255, 255, 0.8);
+    color: var(--color-ink);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--font-family);
+    transform: translateY(0);
+    opacity: 1;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: auto;
+    max-width: 380px;
+    animation: toast-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast.success {
+    border-left: 4px solid var(--color-success);
+}
+
+.toast.error {
+    border-left: 4px solid var(--color-error);
+}
+
+.toast.warning {
+    border-left: 4px solid #F59E0B;
+}
+
+.toast.info {
+    border-left: 4px solid var(--color-trust);
+}
+
+.toast-icon {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-message {
+    flex-grow: 1;
+    line-height: 1.4;
+}
+
+@keyframes toast-slide-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Dark theme overrides for toast */
+body.dark-theme .toast {
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(255, 255, 255, 0.05);
+    box-shadow: 
+        0 15px 35px rgba(0, 0, 0, 0.3),
+        inset 0 2px 4px rgba(255, 255, 255, 0.02);
+    color: white;
+}
+
+/* ============================================================
+   FLIPKART/AMAZON STYLE EMERGENCY STEPPER TRACKER
+   ============================================================ */
+.stepper-container {
+    padding: 20px 24px;
+    background: var(--color-surface-soft);
+    border-radius: 16px;
+    border: 1px solid var(--color-hairline-soft);
+    margin-top: 16px;
+    display: none;
+    animation: stepper-slide-down 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes stepper-slide-down {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+        max-height: 0;
+        overflow: hidden;
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        max-height: 800px;
+    }
+}
+
+.stepper {
+    position: relative;
+    padding-left: 28px;
+    list-style: none;
+    margin: 0;
+}
+.stepper::before {
+    content: '';
+    position: absolute;
+    left: 9px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: var(--color-hairline);
+    z-index: 1;
+}
+
+.stepper-step {
+    position: relative;
+    margin-bottom: 20px;
+}
+.stepper-step:last-child {
+    margin-bottom: 0;
+}
+
+.stepper-icon {
+    position: absolute;
+    left: -28px;
+    top: 2px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--color-canvas);
+    border: 2px solid var(--color-muted-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    z-index: 2;
+    transition: all 0.3s ease;
+    color: var(--color-muted);
+}
+
+.stepper-step.completed .stepper-icon {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: white;
+}
+
+.stepper-step.active .stepper-icon {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+    box-shadow: 0 0 0 4px var(--color-primary-soft);
+    animation: stepper-pulse-ring 1.8s infinite;
+}
+
+@keyframes stepper-pulse-ring {
+    0% {
+        box-shadow: 0 0 0 0 rgba(229, 46, 77, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 6px rgba(229, 46, 77, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(229, 46, 77, 0);
+    }
+}
+
+.stepper-content {
+    padding-left: 8px;
+}
+
+.stepper-title {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--color-ink);
+}
+
+.stepper-desc {
+    font-size: 12px;
+    color: var(--color-muted);
+    margin-top: 4px;
+    line-height: 1.4;
+}
+
+.stepper-time {
+    font-size: 11px;
+    color: var(--color-primary);
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+body.dark-theme .stepper-container {
+    background: rgba(30, 41, 59, 0.4);
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-theme .stepper::before {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-theme .stepper-icon {
+    background: #1e293b;
+    border-color: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.4);
+}
+
+body.dark-theme .stepper-step.completed .stepper-icon {
+    background: #10b981;
+    border-color: #10b981;
+    color: white;
+}
+
+body.dark-theme .stepper-time {
+    color: #ff8f9f;
+}
+
+/* ============================================================
+   GLOBAL LEAFLET MAP DARK THEME STYLING
+   ============================================================ */
+body.dark-theme .map-tiles {
+    filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%) !important;
+}
+
+body.dark-theme .leaflet-container {
+    background: #0f172a !important;
+}
+
+body.dark-theme .leaflet-popup-content-wrapper,
+body.dark-theme .leaflet-popup-tip {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme .leaflet-popup-content-wrapper strong {
+    color: #ffffff !important;
+}
+
+body.dark-theme .leaflet-bar a {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+body.dark-theme .leaflet-bar a:hover {
+    background-color: #334155 !important;
+}
+
+body.dark-theme .leaflet-bar a.leaflet-disabled {
+    background-color: #0f172a !important;
+    color: #475569 !important;
+}

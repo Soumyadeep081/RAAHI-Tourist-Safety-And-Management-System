@@ -163,8 +163,6 @@ async function addContact(e) {
                 relation: relationEl ? relationEl.value.trim() : null,
             }),
         });
-
-        showToast('Emergency contact added ✅', 'success');
         document.getElementById('contact-form').reset();
         loadContacts();
         loadDashboardStats();
@@ -184,7 +182,6 @@ async function deleteContact(id) {
 
     try {
         await apiFetch(`/contacts/${id}`, { method: 'DELETE' });
-        showToast('Contact removed', 'info');
         loadContacts();
         loadDashboardStats();
     } catch (err) {
@@ -222,7 +219,6 @@ async function reportIncident(e) {
             method: 'POST',
             body: JSON.stringify(payload),
         });
-        showToast('Incident reported. Thank you for helping. ⚠️', 'success');
         document.getElementById('incident-form').reset();
         loadMyIncidents();
     } catch (err) {

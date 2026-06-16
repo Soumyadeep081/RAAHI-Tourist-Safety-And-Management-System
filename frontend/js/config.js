@@ -53,15 +53,38 @@ function showToast(message, type = 'info') {
 
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
+    
+    // Determine a clean icon
+    let icon = 'ℹ️';
+    if (type === 'success') icon = '✅';
+    else if (type === 'error') icon = '❌';
+    else if (type === 'warning') icon = '⚠️';
+
+    // Strip duplicate icons/emojis from the message to prevent redundant double icons (e.g. ✅ 🚨)
+    let cleanMessage = message.trim();
+    const leadingEmojis = ['🚨', '✅', '❌', '⚠️', '💚', 'ℹ️', '📍', '🛰️', '🔐', '🗑️', '🔒', '🔔'];
+    for (const em of leadingEmojis) {
+        if (cleanMessage.startsWith(em)) {
+            cleanMessage = cleanMessage.slice(em.length).trim();
+            break;
+        }
+    }
+    for (const em of leadingEmojis) {
+        if (cleanMessage.endsWith(em)) {
+            cleanMessage = cleanMessage.slice(0, -em.length).trim();
+            break;
+        }
+    }
+
     toast.innerHTML = `
-        <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-        <span>${message}</span>
+        <span class="toast-icon">${icon}</span>
+        <span class="toast-message">${cleanMessage}</span>
     `;
     container.appendChild(toast);
 
     setTimeout(() => {
         toast.style.opacity = '0';
-        toast.style.transform = 'translateX(40px)';
+        toast.style.transform = 'translateY(10px) scale(0.95)';
         setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
@@ -92,5 +115,59 @@ function formatTime(isoString) {
         month: 'short',
         hour: '2-digit',
         minute: '2-digit',
+    });
+}
+
+// ---- Global Theme Loader & Toggle Injector ----
+(function initGlobalTheme() {
+    const savedTheme = localStorage.getItem('raahi_theme');
+    const isDark = savedTheme === 'dark';
+    if (isDark) {
+        document.body.classList.add('dark-theme');
+    }
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Sync theme class on body (in case it wasn't applied early)
+    const savedTheme = localStorage.getItem('raahi_theme');
+    const isDark = savedTheme === 'dark';
+    if (isDark) {
+        document.body.classList.add('dark-theme');
+    } else {
+        document.body.classList.remove('dark-theme');
+    }
+
+    // 2. Locate navbar actions container
+    const navActions = document.getElementById('nav-auth-actions') || document.querySelector('.nav-actions');
+    if (navActions && !document.getElementById('theme-toggle')) {
+        // Create the theme toggle button
+        const themeBtn = document.createElement('button');
+        themeBtn.id = 'theme-toggle';
+        themeBtn.className = 'icon-btn';
+        themeBtn.setAttribute('aria-label', 'Toggle Theme');
+        themeBtn.style.marginRight = '8px';
+        themeBtn.onclick = toggleTheme;
+
+        // SVG Icons
+        themeBtn.innerHTML = `
+            <svg id="theme-icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: ${isDark ? 'block' : 'none'};"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg id="theme-icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display: ${isDark ? 'none' : 'block'};"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        `;
+
+        // Prepend theme button to navbar actions
+        navActions.insertBefore(themeBtn, navActions.firstChild);
+    }
+});
+
+function toggleTheme() {
+    const isDark = document.body.classList.toggle('dark-theme');
+    localStorage.setItem('raahi_theme', isDark ? 'dark' : 'light');
+    
+    // Sync all icons on the page
+    document.querySelectorAll('#theme-icon-moon').forEach(el => {
+        el.style.display = isDark ? 'none' : 'block';
+    });
+    document.querySelectorAll('#theme-icon-sun').forEach(el => {
+        el.style.display = isDark ? 'block' : 'none';
     });
 }

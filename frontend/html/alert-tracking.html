@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Alert Resolution – Raahi</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <!-- Leaflet JS for Map Integration -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        body { 
+            background: #F7F9FA; 
+            background-image: 
+                radial-gradient(at 100% 0%, rgba(229, 46, 77, 0.03) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(10, 37, 64, 0.03) 0px, transparent 50%);
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .tracking-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1.8fr;
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+            min-height: 70vh;
+        }
+
+        #tracking-map-pane {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            border-radius: 24px;
+            background: #e2e8f0;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Large custom beacon marker animation */
+        .beacon-marker {
+            position: relative;
+        }
+        .beacon-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 3px solid var(--color-primary);
+            opacity: 0;
+            animation: beacon-pulse 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes beacon-pulse {
+            0% { transform: scale(0.6); opacity: 0.8; }
+            100% { transform: scale(2.2); opacity: 0; }
+        }
+
+        /* Stepper display formatting */
+        .stepper-card {
+            background: white;
+            border-radius: 24px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: background 0.3s, border-color 0.3s;
+        }
+
+        /* Dark mode overrides */
+        body.dark-theme {
+            background: #0F172A !important;
+            background-image: 
+                radial-gradient(at 100% 0%, rgba(229, 46, 77, 0.04) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(10, 37, 64, 0.04) 0px, transparent 50%) !important;
+        }
+
+        body.dark-theme .stepper-card {
+            background: rgba(30, 41, 59, 0.65) !important;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        body.dark-theme #tracking-map-pane {
+            background: #1e293b;
+            border-color: rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 992px) {
+            .tracking-grid {
+                grid-template-columns: 1fr;
+            }
+            #tracking-map-pane {
+                min-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container">
+            <a href="dashboard.html" class="brand-logo">
+                <div class="brand-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                Raahi
+            </a>
+            <div class="nav-actions">
+                <a href="dashboard.html" class="btn btn-outline btn-sm" style="border-radius: 30px; padding: 8px 20px;">
+                    ⬅️ Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: var(--space-xl); padding-bottom: var(--space-section);">
+        <div class="welcome-header" style="padding: 12px 0 0 0; margin-bottom: var(--space-md);">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span id="alert-badge" class="badge badge-active" style="font-size: 13px; padding: 6px 16px; border-radius: 20px;">SOS ACTIVE</span>
+                <span style="font-size: 13px; color: var(--color-muted); font-weight: 600;" id="alert-time-elapsed">Calculating duration...</span>
+            </div>
+            <h1 class="text-display-lg" style="margin-top: 12px;">Emergency Resolution Tracker</h1>
+            <p class="text-body-md" style="color: var(--color-muted); margin-top: 4px;">Real-time progress monitoring and rescue dispatch coordinates.</p>
+        </div>
+
+        <div class="tracking-grid">
+            <!-- Left panel: Stepper card -->
+            <div class="stepper-card">
+                <div>
+                    <h3 class="text-title-lg" style="margin-bottom: 24px; border-bottom: 1px solid var(--color-hairline-soft); padding-bottom: 16px; display: flex; align-items: center; gap: 10px;">
+                        📦 Timeline Progress
+                    </h3>
+                    <div id="stepper-display">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </div>
+
+                <div style="margin-top: 32px; border-top: 1px solid var(--color-hairline-soft); padding-top: 24px;">
+                    <div style="background: var(--color-surface-soft); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                        <div class="text-caption" style="font-size: 11px;">DISTRESS MESSAGE</div>
+                        <div id="alert-message-display" style="font-size: 14px; font-weight: 600; color: var(--color-ink); margin-top: 6px; font-style: italic;">
+                            "No details provided."
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button id="resolve-btn" class="btn btn-primary" onclick="resolveCurrentAlert()" style="flex: 1; padding: 14px; font-size: 14px; border-radius: 12px; box-shadow: 0 4px 15px rgba(229,46,77,0.25);">
+                            💚 Mark Resolved
+                        </button>
+                        <a href="dashboard.html" class="btn btn-secondary" style="flex: 1; padding: 14px; font-size: 14px; border-radius: 12px; border: 1px solid var(--color-hairline); text-align: center; text-decoration: none; display: flex; justify-content: center; align-items: center;">
+                            Back
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right panel: Interactive map -->
+            <div>
+                <div id="tracking-map-pane"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Core Scripts -->
+    <script src="../js/config.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        // Extract alert ID from URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const alertId = parseInt(urlParams.get('id'));
+
+        let trackingMap = null;
+        let alertMarker = null;
+        let alertCircle = null;
+        let pollingIntervalId = null;
+        let currentAlertObj = null;
+
+        // Ensure user is authenticated
+        (function guard() {
+            if (!isAuthenticated()) {
+                window.location.href = 'login.html';
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!alertId) {
+                showToast('No Alert ID provided to track.', 'error');
+                setTimeout(() => window.location.href = 'dashboard.html', 2000);
+                return;
+            }
+
+            // Sync theme class immediately
+            const savedTheme = localStorage.getItem('raahi_theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            }
+
+            // Fetch alert details and initialize
+            fetchAlertDetailsAndSync();
+
+            // Set up 3 seconds polling loop
+            pollingIntervalId = setInterval(fetchAlertDetailsAndSync, 3000);
+        });
+
+        async function fetchAlertDetailsAndSync() {
+            try {
+                const alerts = await apiFetch('/alerts/my');
+                const alert = alerts.find(a => a.id === alertId);
+
+                if (!alert) {
+                    showToast('Alert not found in your dispatch record.', 'error');
+                    clearInterval(pollingIntervalId);
+                    setTimeout(() => window.location.href = 'dashboard.html', 3000);
+                    return;
+                }
+
+                currentAlertObj = alert;
+                updateAlertUI(alert);
+                initOrUpdateMap(alert);
+            } catch (err) {
+                console.error('[Alert Tracking] Fetch failed:', err);
+            }
+        }
+
+        function updateAlertUI(alert) {
+            // Update status badge
+            const badge = document.getElementById('alert-badge');
+            if (badge) {
+                badge.textContent = `SOS ${alert.status}`;
+                badge.className = 'badge ' + (alert.status === 'ACTIVE' ? 'badge-active' : 'badge-resolved');
+            }
+
+            // Update duration/elapsed display
+            const elapsedEl = document.getElementById('alert-time-elapsed');
+            if (elapsedEl) {
+                const elapsedSec = Math.max(0, Math.round((new Date().getTime() - new Date(alert.createdAt).getTime()) / 1000));
+                if (alert.status === 'RESOLVED') {
+                    elapsedEl.textContent = 'Resolved and Secure';
+                } else if (elapsedSec < 60) {
+                    elapsedEl.textContent = `${elapsedSec}s elapsed`;
+                } else {
+                    elapsedEl.textContent = `${Math.round(elapsedSec / 60)} min elapsed`;
+                }
+            }
+
+            // Update message text
+            const messageEl = document.getElementById('alert-message-display');
+            if (messageEl) {
+                messageEl.textContent = alert.message ? `"${alert.message}"` : '"No message details provided."';
+            }
+
+            // Update stepper timeline
+            const stepperContainer = document.getElementById('stepper-display');
+            if (stepperContainer) {
+                stepperContainer.innerHTML = buildStepperHTML(alert);
+            }
+
+            // Hide/Show Resolve Button
+            const resolveBtn = document.getElementById('resolve-btn');
+            if (resolveBtn) {
+                resolveBtn.style.display = alert.status === 'ACTIVE' ? 'block' : 'none';
+            }
+        }
+
+        function buildStepperHTML(alert) {
+            const createdTime = new Date(alert.createdAt).getTime();
+            const now = new Date().getTime();
+            const elapsedSeconds = (now - createdTime) / 1000;
+
+            let currentStepIndex = 0; // 0 to 4
+            const isResolved = alert.status === 'RESOLVED';
+
+            if (isResolved) {
+                currentStepIndex = 4;
+            } else {
+                if (elapsedSeconds < 15) {
+                    currentStepIndex = 0;
+                } else if (elapsedSeconds < 45) {
+                    currentStepIndex = 1;
+                } else if (elapsedSeconds < 90) {
+                    currentStepIndex = 2;
+                } else {
+                    currentStepIndex = 3;
+                }
+            }
+
+            const steps = [
+                { title: 'Alert Triggered 🚨', desc: 'Emergency signal successfully transmitted from your device.' },
+                { title: 'Dispatch Center Notified 📞', desc: 'Raahi Emergency response team routing coordinates to local rescue stations.' },
+                { title: 'Emergency Responders Dispatched 🚒', desc: 'Local police, fire, or medical units dispatched to your coordinates.' },
+                { title: 'Responders Arrived on Scene 🚑', desc: 'Emergency personnel are arriving at your live tracking area.' },
+                { title: 'Alert Resolved & Safe 💚', desc: 'The distress situation has been marked resolved. You are safe.' }
+            ];
+
+            let html = `<ul class="stepper" style="padding-left: 28px; list-style: none;">`;
+            steps.forEach((step, idx) => {
+                let statusClass = '';
+                let stepTimeText = '';
+
+                if (isResolved || idx < currentStepIndex) {
+                    statusClass = 'completed';
+                    let offsetMs = idx === 0 ? 0 : idx === 1 ? 15000 : idx === 2 ? 45000 : 90000;
+                    let stepTime = new Date(createdTime + offsetMs);
+                    if (idx === 4) {
+                        stepTime = alert.resolvedAt ? new Date(alert.resolvedAt) : new Date(createdTime + 120000);
+                    }
+                    stepTimeText = formatTime(stepTime.toISOString());
+                } else if (idx === currentStepIndex) {
+                    statusClass = 'active';
+                    stepTimeText = 'In Progress...';
+                } else {
+                    statusClass = 'pending';
+                    stepTimeText = '';
+                }
+
+                const iconContent = (isResolved || idx < currentStepIndex) ? '✓' : idx + 1;
+
+                html += `
+                    <li class="stepper-step ${statusClass}">
+                        <span class="stepper-icon">${iconContent}</span>
+                        <div class="stepper-content">
+                            <div class="stepper-title">${step.title}</div>
+                            <div class="stepper-desc">${step.desc}</div>
+                            ${stepTimeText ? `<div class="stepper-time">${stepTimeText}</div>` : ''}
+                        </div>
+                    </li>
+                `;
+            });
+            html += `</ul>`;
+            return html;
+        }
+
+        function initOrUpdateMap(alert) {
+            const lat = alert.latitude;
+            const lng = alert.longitude;
+
+            if (!trackingMap) {
+                // Initialize map centered at the distress coordinates
+                trackingMap = L.map('tracking-map-pane').setView([lat, lng], 15);
+                
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    className: 'map-tiles'
+                }).addTo(trackingMap);
+
+                // Custom elegant flashing beacon marker
+                const customIconHtml = `
+                    <div class="beacon-marker">
+                        <div class="beacon-ring"></div>
+                        <div style="background: var(--color-primary); width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);"></div>
+                    </div>
+                `;
+
+                const customIcon = L.divIcon({
+                    className: 'custom-beacon-icon',
+                    html: customIconHtml,
+                    iconSize: [16, 16],
+                    iconAnchor: [8, 8]
+                });
+
+                alertMarker = L.marker([lat, lng], { icon: customIcon }).addTo(trackingMap)
+                    .bindPopup(`<strong>Distress Signal Location</strong><br>Lat: ${lat.toFixed(6)}, Lng: ${lng.toFixed(6)}`)
+                    .openPopup();
+
+                // Draw alert range circle
+                alertCircle = L.circle([lat, lng], {
+                    color: 'var(--color-primary)',
+                    fillColor: 'var(--color-primary)',
+                    fillOpacity: 0.1,
+                    weight: 1.5,
+                    radius: 200
+                }).addTo(trackingMap);
+
+            } else {
+                // Keep center updated
+                trackingMap.setView([lat, lng]);
+                alertMarker.setLatLng([lat, lng]);
+                alertCircle.setLatLng([lat, lng]);
+            }
+        }
+
+        async function resolveCurrentAlert() {
+            if (!alertId) return;
+            if (!confirm('Are you sure you want to mark this emergency alert as resolved?')) return;
+
+            try {
+                await apiFetch(`/alerts/${alertId}/resolve`, { method: 'PUT' });
+                // Instantly sync UI to show completed stepper
+                fetchAlertDetailsAndSync();
+                showToast('Distress situation marked resolved. You are safe! 💚', 'success');
+            } catch (err) {
+                console.error('[Alert Tracking] Failed to resolve:', err);
+                showToast('Failed to resolve alert: ' + err.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

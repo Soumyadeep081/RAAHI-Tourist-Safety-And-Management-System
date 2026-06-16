@@ -3,8 +3,11 @@ package com.raahi.service;
 import com.raahi.dto.AlertDTO;
 import com.raahi.entity.Alert;
 import com.raahi.entity.User;
+import com.raahi.entity.EmergencyContact;
 import com.raahi.repository.AlertRepository;
+import com.raahi.repository.EmergencyContactRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -13,9 +16,12 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AlertService {
 
     private final AlertRepository alertRepository;
+    private final EmergencyContactRepository emergencyContactRepository;
+    private final EmailService emailService;
 
     // ~1 degree latitude ≈ 111 km
     private static final double KM_PER_DEGREE = 111.0;
@@ -31,6 +37,27 @@ public class AlertService {
                 .build();
 
         alert = alertRepository.save(alert);
+
+        // Notify all emergency contacts of this user via email
+        try {
+            List<EmergencyContact> contacts = emergencyContactRepository.findByUserId(user.getId());
+            for (EmergencyContact contact : contacts) {
+                if (contact.getEmail() != null && !contact.getEmail().trim().isEmpty()) {
+                    emailService.sendSOSTrackingEmail(
+                            contact.getEmail(),
+                            contact.getName(),
+                            user.getName(),
+                            alert.getId(),
+                            alert.getLatitude(),
+                            alert.getLongitude(),
+                            alert.getMessage()
+                    );
+                }
+            }
+        } catch (Exception e) {
+            log.error("Failed to notify emergency contacts for alert ID: {}. Error: {}", alert.getId(), e.getMessage());
+        }
+
         return toDTO(alert);
     }
 

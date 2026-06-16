@@ -85,7 +85,6 @@ const OfflineManager = {
         this.saveQueue(failed);
 
         if (failed.length === 0) {
-            showToast('All offline data synced successfully!', 'success');
             hideConnectionBar();
         } else {
             console.warn(`[Offline] ${failed.length} items failed to sync. Will retry later.`);

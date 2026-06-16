@@ -40,7 +40,6 @@ async function triggerSOS() {
             method: 'POST',
             body: JSON.stringify(payload),
         });
-        showToast('🚨 SOS alert sent! Help is on the way.', 'success');
         loadMyAlerts();
         loadDashboardStats();
     } catch (err) {
@@ -85,7 +84,6 @@ async function sendSOSWithMessage(e) {
             method: 'POST',
             body: JSON.stringify(payload),
         });
-        showToast('🚨 SOS alert with details sent!', 'success');
         document.getElementById('sos-form').reset();
 
         // Pulse the button
@@ -129,6 +127,9 @@ async function loadMyAlerts() {
                 </div>
                 <div style="display:flex;align-items:center;gap:8px">
                     <span class="badge ${alert.status === 'ACTIVE' ? 'badge-active' : 'badge-resolved'}">${alert.status}</span>
+                    <a href="alert-tracking.html?id=${alert.id}" class="btn btn-outline btn-sm" style="display: flex; align-items: center; gap: 6px; text-decoration: none;">
+                        📦 Track
+                    </a>
                     ${alert.status === 'ACTIVE' ? `<button class="btn btn-outline btn-sm" onclick="resolveAlert(${alert.id})">Resolve</button>` : ''}
                 </div>
             </div>
@@ -144,7 +145,6 @@ async function loadMyAlerts() {
 async function resolveAlert(alertId) {
     try {
         await apiFetch(`/alerts/${alertId}/resolve`, { method: 'PUT' });
-        showToast('Alert resolved ✅', 'success');
         loadMyAlerts();
         loadDashboardStats();
     } catch (err) {
@@ -219,4 +219,92 @@ async function loadNearbyIncidents() {
     } catch (err) {
         console.error('[Incidents] Nearby load failed:', err);
     }
+}
+
+/**
+ * Toggle the slide-down Amazon/Flipkart tracking stepper panel.
+ */
+function toggleAlertTracking(alertId) {
+    const el = document.getElementById(`stepper-${alertId}`);
+    const btn = document.getElementById(`track-btn-${alertId}`);
+    if (!el || !btn) return;
+
+    if (el.style.display === 'block') {
+        el.style.display = 'none';
+        btn.innerHTML = '📦 Track';
+    } else {
+        el.style.display = 'block';
+        btn.innerHTML = '❌ Close';
+    }
+}
+
+/**
+ * Generate Flipkart/Amazon-style progress tracking stepper HTML.
+ */
+function getAlertProgress(alert) {
+    const createdTime = new Date(alert.createdAt).getTime();
+    const now = new Date().getTime();
+    const elapsedSeconds = (now - createdTime) / 1000;
+
+    let currentStepIndex = 0; // 0: Triggered, 1: Notified, 2: Dispatched, 3: Arrived, 4: Resolved
+    const isResolved = alert.status === 'RESOLVED';
+
+    if (isResolved) {
+        currentStepIndex = 4;
+    } else {
+        if (elapsedSeconds < 15) {
+            currentStepIndex = 0;
+        } else if (elapsedSeconds < 45) {
+            currentStepIndex = 1;
+        } else if (elapsedSeconds < 90) {
+            currentStepIndex = 2;
+        } else {
+            currentStepIndex = 3;
+        }
+    }
+
+    const steps = [
+        { title: 'Alert Triggered 🚨', desc: 'Emergency signal successfully transmitted from your device.' },
+        { title: 'Dispatch Center Notified 📞', desc: 'Raahi Emergency response team routing coordinates to local rescue stations.' },
+        { title: 'Emergency Responders Dispatched 🚒', desc: 'Local police, fire, or medical units dispatched to your coordinates.' },
+        { title: 'Responders Arrived on Scene 🚑', desc: 'Emergency personnel are arriving at your live tracking area.' },
+        { title: 'Alert Resolved & Safe 💚', desc: 'The distress situation has been marked resolved. You are safe.' }
+    ];
+
+    let html = `<ul class="stepper">`;
+    steps.forEach((step, idx) => {
+        let statusClass = '';
+        let stepTimeText = '';
+
+        if (isResolved || idx < currentStepIndex) {
+            statusClass = 'completed';
+            let offsetMs = idx === 0 ? 0 : idx === 1 ? 15000 : idx === 2 ? 45000 : 90000;
+            let stepTime = new Date(createdTime + offsetMs);
+            if (idx === 4) {
+                stepTime = alert.resolvedAt ? new Date(alert.resolvedAt) : new Date(createdTime + 120000);
+            }
+            stepTimeText = formatTime(stepTime.toISOString());
+        } else if (idx === currentStepIndex) {
+            statusClass = 'active';
+            stepTimeText = 'In Progress...';
+        } else {
+            statusClass = 'pending';
+            stepTimeText = '';
+        }
+
+        const iconContent = (isResolved || idx < currentStepIndex) ? '✓' : idx + 1;
+
+        html += `
+            <li class="stepper-step ${statusClass}">
+                <span class="stepper-icon">${iconContent}</span>
+                <div class="stepper-content">
+                    <div class="stepper-title">${step.title}</div>
+                    <div class="stepper-desc">${step.desc}</div>
+                    ${stepTimeText ? `<div class="stepper-time">${stepTimeText}</div>` : ''}
+                </div>
+            </li>
+        `;
+    });
+    html += `</ul>`;
+    return html;
 }

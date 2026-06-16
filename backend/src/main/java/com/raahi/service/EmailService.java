@@ -43,4 +43,33 @@ public class EmailService {
             // just because the SMTP config (App Password) is missing.
         }
     }
+
+    public void sendSOSTrackingEmail(String to, String contactName, String userName, Long alertId, double latitude, double longitude, String alertMessage) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(to);
+            message.setSubject("🚨 EMERGENCY: SOS Alert Triggered by " + userName);
+
+            String trackingUrl = "http://127.0.0.1:5500/html/alert-tracking.html?id=" + alertId;
+            String msgText = (alertMessage != null && !alertMessage.trim().isEmpty()) ? "\"" + alertMessage + "\"" : "No details provided.";
+
+            String body = "Hi " + contactName + ",\n\n"
+                    + "🚨 This is an emergency notification from Raahi. 🚨\n\n"
+                    + userName + " has triggered a distress SOS alert!\n\n"
+                    + "Details:\n"
+                    + "• Distress Message: " + msgText + "\n"
+                    + "• Location Coordinates: Latitude " + latitude + ", Longitude " + longitude + "\n"
+                    + "• Map / Tracking URL: " + trackingUrl + "\n\n"
+                    + "Please click the link above to trace their live coordinates and emergency resolution progress.\n\n"
+                    + "Stay safe,\nThe Raahi Team";
+
+            message.setText(body);
+            mailSender.send(message);
+
+            log.info("SOS alert email sent successfully to: {}", to);
+        } catch (Exception e) {
+            log.error("Failed to send SOS email to: {}. Error: {}", to, e.getMessage());
+        }
+    }
 }
